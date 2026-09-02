@@ -1,0 +1,52 @@
+# Alert threshold rules
+# Operators: gt, ge, lt, le, between
+# Severities: info, warning, severe, extreme
+
+rules:
+  - variable: "precipitation"
+    threshold: 50.0
+    operator: "ge"
+    severity: "severe"
+    name: "heavy_rain_50mm"
+    message_template: "Severe rainfall: {value:.1f} mm forecast at ({lat:.2f}, {lon:.2f})"
+    cooldown_minutes: 120
+
+  - variable: "precipitation"
+    threshold: 100.0
+    operator: "ge"
+    severity: "extreme"
+    name: "extreme_rain_100mm"
+    message_template: "EXTREME rainfall: {value:.1f} mm forecast at ({lat:.2f}, {lon:.2f})"
+    cooldown_minutes: 180
+
+  - variable: "temperature"
+    threshold: 35.0
+    operator: "ge"
+    severity: "severe"
+    name: "heat_wave_35c"
+    message_template: "Heat: {value:.1f} °C forecast at ({lat:.2f}, {lon:.2f})"
+    cooldown_minutes: 60
+
+  - variable: "temperature"
+    threshold: 0.0
+    operator: "le"
+    severity: "warning"
+    name: "freezing_temp"
+    message_template: "Frost: {value:.1f} °C forecast at ({lat:.2f}, {lon:.2f})"
+    cooldown_minutes: 60
+
+  - variable: "wind_speed"
+    threshold: 60.0
+    operator: "ge"
+    severity: "severe"
+    name: "storm_wind_60"
+    message_template: "Storm winds: {value:.1f} km/h at ({lat:.2f}, {lon:.2f})"
+    cooldown_minutes: 90
+
+  - variable: "cape"
+    threshold: 2000.0
+    operator: "ge"
+    severity: "warning"
+    name: "high_cape"
+    message_template: "Elevated instability (CAPE {value:.0f}) at ({lat:.2f}, {lon:.2f})"
+    cooldown_minutes: 120

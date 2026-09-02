@@ -1,0 +1,63 @@
+# Barograph configuration
+
+ingestion:
+  gfs_base_url: "https://nomads.ncep.noaa.gov:443/cgi-bin/filter_gfs_0p25.pl"
+  ecmwf_base_url: "https://apps.ecmwf.int/datasets/data/ifs"
+  era5_base_url: "https://cds.climate.copernicus.eu/api/v2"
+  data_dir: "./data/ingested"
+  cache_ttl_hours: 6
+  max_retries: 3
+  timeout_seconds: 120
+
+downscaling:
+  method: "quantile_delta_transform"
+  grid_resolution_km: 1.0
+  training_years: [2010, 2020]
+  variables: ["temperature", "precipitation"]
+  dem_path: null
+
+mos:
+  algorithm: "gradient_boosting"
+  feature_window_hours: 24
+  forecast_hours_ahead: [1, 3, 6, 12, 24, 48, 72, 96, 120]
+  calibration_station_ids: []
+  retrain_interval_days: 7
+  model_dir: "./models/mos"
+
+ensemble:
+  pooling_method: "pit"
+  crps_method: "nargessian"
+  n_members: 51
+  calibration: true
+  pooling_bins: 100
+
+postprocessing:
+  emos_n_members: 51
+  quantile_mapping_method: "empirical"
+  n_bins: 1000
+  training_window_days: 365
+  min_training_samples: 30
+  distribution: "truncated_normal"
+
+verification:
+  metrics: ["crps", "brier", "reliability", "bias", "mae", "rmse"]
+  brier_thresholds: [0.1, 1.0, 5.0, 10.0, 25.0, 50.0]
+  reliability_bins: 10
+  output_dir: "./output/verification"
+
+nowcasting:
+  optical_flow_method: "farneback"
+  flow_radius: 12
+  extrapolation_minutes: [15, 30, 45, 60, 90, 120]
+  radar_composite_url: ""
+  min_reflectivity_dbz: 0.0
+  max_reflectivity_dbz: 70.0
+
+alerts:
+  rules_file: "./configs/alert_rules.yaml"
+  cooldown_minutes: 60
+  notification_channels: ["log", "stdout"]
+  webhook_urls: []
+
+log_level: "INFO"
+n_workers: 4

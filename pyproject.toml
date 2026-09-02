@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "barograph"
+version = "0.1.0"
+description = "Weather forecast modeling, post-processing and verification"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Barograph Contributors" }]
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2.0",
+    "xarray>=2023.1",
+    "netCDF4>=1.6",
+    "scipy>=1.11",
+    "scikit-learn>=1.3",
+    "dask[complete]>=2023.7",
+    "zarr>=2.15",
+    "cfgrib>=0.9",
+    "eccodes>=1.6",
+    "click>=8.1",
+    "rich>=13.0",
+    "pyyaml>=6.0",
+    "toml>=0.10",
+    "loguru>=0.7",
+    "pyproj>=3.6",
+    "rasterio>=1.3",
+    "opencv-python>=4.8",
+    "propeller>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "pytest-xdist>=3.3",
+    "mypy>=1.5",
+    "ruff>=0.0.280",
+    "pre-commit>=3.3",
+]
+
+[project.scripts]
+barograph = "barograph.cli.main:cli"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+# N803/N806/N812: uppercase X/Z feature matrices and aliasing are idiomatic
+# in scientific ML code; E501 is relaxed below.
+ignore = ["N803", "N806", "N812"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
