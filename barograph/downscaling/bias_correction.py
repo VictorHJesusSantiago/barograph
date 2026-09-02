@@ -55,6 +55,8 @@ class BiasCorrectionDownscaler(BaseDownscaler):
     def transform(self, coarse: GriddedField) -> GriddedField:
         if not self._fitted:
             raise RuntimeError("BiasCorrectionDownscaler must be fit before transform.")
+        if self._bias is None or self._scale is None or self._fine_mean is None:
+            raise RuntimeError("BiasCorrectionDownscaler is not fitted.")
 
         data = coarse.data.astype(np.float32)
         if self.mode == "additive":

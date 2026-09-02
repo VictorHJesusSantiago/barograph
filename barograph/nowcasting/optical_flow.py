@@ -74,7 +74,7 @@ class OpticalFlowNowcaster:
         p1 = (f1 * 255).astype(np.uint8)
         p2 = (f2 * 255).astype(np.uint8)
 
-        flow = cv2.calcOpticalFlowFarneback(
+        flow = cv2.calcOpticalFlowFarneback(  # type: ignore[call-overload]
             p1, p2,
             flow=None,
             pyr_scale=self.pyr_scale,
@@ -110,7 +110,7 @@ class OpticalFlowNowcaster:
         if len(pts) == 0:
             return np.zeros_like(f1), np.zeros_like(f1)
 
-        next_pts, st, err = cv2.calcOpticalFlowPyrLK(
+        next_pts, st, err = cv2.calcOpticalFlowPyrLK(  # type: ignore[call-overload]
             p1, p2, pts, None,
             winSize=(self.winsize, self.winsize),
             maxLevel=self.levels,

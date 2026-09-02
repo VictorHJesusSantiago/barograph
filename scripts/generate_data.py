@@ -111,7 +111,7 @@ if __name__ == "__main__":
     fc.set_defaults(func=gen_forecast)
 
     ra = sub.add_parser("radar")
-    ra.add_argument("--dir", default="data/gen/radar")
+    ra.add_argument("--dir", dest="out_dir", default="data/gen/radar")
     ra.add_argument("--n", type=int, default=4)
     ra.set_defaults(func=gen_radar_sweeps)
 

@@ -11,6 +11,8 @@ from loguru import logger
 
 from barograph.core.config import IngestionConfig
 from barograph.core.models import GriddedField, ModelSource, Variable
+from barograph.core.temporal import utcnow
+from barograph.ingestion._grib import require_cfgrib
 
 
 class ECMWFIngester:
@@ -40,6 +42,7 @@ class ECMWFIngester:
         level: float | None = None,
     ) -> GriddedField:
         """Parse a single GRIB file into a GriddedField."""
+        require_cfgrib()
         short_name = self.VARIABLE_MAP.get(variable, variable)
 
         ds = xr.open_dataset(
@@ -99,6 +102,7 @@ class ECMWFIngester:
         levels: list[float],
     ) -> list[GriddedField]:
         """Parse a GRIB file with multiple pressure levels."""
+        require_cfgrib()
         results = []
         for lev in levels:
             try:
@@ -142,7 +146,7 @@ class ECMWFIngester:
     def _extract_init_time(ds: xr.Dataset) -> datetime:
         if "time" in ds.coords:
             return ds.time.values.item()
-        return datetime.utcnow()
+        return utcnow()
 
     @staticmethod
     def _extract_valid_time(ds: xr.Dataset) -> datetime:
@@ -153,4 +157,4 @@ class ECMWFIngester:
                 from datetime import timedelta
                 return ref + timedelta(seconds=step.total_seconds())
             return ref
-        return datetime.utcnow()
+        return utcnow()

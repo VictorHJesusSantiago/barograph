@@ -100,6 +100,8 @@ class QuantileMapper:
         q_levels = self._quantile_levels
         model_q = self._model_quantiles
         obs_q = self._obs_quantiles
+        if q_levels is None or model_q is None or obs_q is None:
+            raise RuntimeError("QuantileMapper must be fit before transform.")
 
         if value <= model_q[0]:
             tau = 0.0
@@ -122,5 +124,11 @@ class QuantileMapper:
     def inverse_transform(self, corrected_value: float) -> float:
         """Inverse mapping (obs-space back to model-space) if needed."""
         q_levels = self._quantile_levels
+        if (
+            q_levels is None
+            or self._obs_quantiles is None
+            or self._model_quantiles is None
+        ):
+            raise RuntimeError("QuantileMapper must be fit before transform.")
         tau = float(np.interp(corrected_value, self._obs_quantiles, q_levels))
         return float(np.interp(tau, q_levels, self._model_quantiles))

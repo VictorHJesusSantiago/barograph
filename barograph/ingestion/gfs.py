@@ -11,6 +11,8 @@ from loguru import logger
 
 from barograph.core.config import IngestionConfig
 from barograph.core.models import GriddedField, ModelSource, Variable
+from barograph.core.temporal import utcnow
+from barograph.ingestion._grib import require_cfgrib
 
 
 class GFSIngester:
@@ -40,6 +42,7 @@ class GFSIngester:
         level: float | None = None,
     ) -> GriddedField:
         """Parse a single GRIB2 file into a GriddedField."""
+        require_cfgrib()
         ds = xr.open_dataset(
             file_path,
             engine="cfgrib",
@@ -107,7 +110,7 @@ class GFSIngester:
             return ds.time.values.item()
         if "forecast_reference_time" in ds.coords:
             return ds.forecast_reference_time.values.item()
-        return datetime.utcnow()
+        return utcnow()
 
     @staticmethod
     def _extract_valid_time(ds: xr.Dataset) -> datetime:
@@ -120,7 +123,7 @@ class GFSIngester:
             return ref
         if "time" in ds.coords:
             return ds.time.values.item()
-        return datetime.utcnow()
+        return utcnow()
 
     def download_gfs(
         self,

@@ -10,6 +10,7 @@ from loguru import logger
 
 from barograph.alerts.rules import AlertRule
 from barograph.core.models import Coordinate, GriddedField, ThresholdAlert, Variable
+from barograph.core.temporal import utcnow
 
 
 class AlertEngine:
@@ -82,7 +83,7 @@ class AlertEngine:
                         threshold=rule.threshold,
                         operator=rule.operator.value,
                         location=Coordinate(latitude=lat, longitude=lon),
-                        trigger_time=datetime.utcnow(),
+                        trigger_time=utcnow(),
                         forecast_time=field.valid_time,
                         value=value,
                         severity=rule.severity.value,
@@ -117,7 +118,7 @@ class AlertEngine:
                 threshold=rule.threshold,
                 operator=rule.operator.value,
                 location=Coordinate(latitude=lat, longitude=lon),
-                trigger_time=datetime.utcnow(),
+                trigger_time=utcnow(),
                 forecast_time=valid_time,
                 value=float(value),
                 severity=rule.severity.value,
@@ -155,7 +156,7 @@ class AlertEngine:
                         threshold=rule.threshold,
                         operator=rule.operator.value,
                         location=Coordinate(field.lats[i], field.lons[j]),
-                        trigger_time=datetime.utcnow(),
+                        trigger_time=utcnow(),
                         forecast_time=field.valid_time,
                         value=value,
                         severity=rule.severity.value,

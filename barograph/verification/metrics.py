@@ -82,11 +82,10 @@ class VerificationMetrics:
         results["bias"] = self.bias(obs, fcst)
         results["correlation"] = self.correlation(obs, fcst)
 
-        if prob is not None and len(prob) == len(obs):
+        if prob is not None and len(prob) == len(obs) and np.all((obs == 0) | (obs == 1)):
             results["brier"] = float(np.mean(brier_score(prob, obs)))
-            if np.all((obs == 0) | (obs == 1)):
-                from barograph.verification.brier import brier_decomposition
-                results.update(brier_decomposition(prob, obs))
+            from barograph.verification.brier import brier_decomposition
+            results.update(brier_decomposition(prob, obs))
 
         if ensemble is not None:
             # ensemble may be 2D (n_members, n_samples)

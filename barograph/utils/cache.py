@@ -28,9 +28,8 @@ class TTLCache:
     def get(self, key: str) -> Any | None:
         """Retrieve from cache if not expired."""
         data_path = self._key_path(key)
-        meta_path = self._meta_path(key)
 
-        if not data_path.exists() or not meta_path.exists():
+        if not data_path.exists():
             return None
 
         # Check TTL
@@ -68,10 +67,20 @@ class TTLCache:
         return time.time() - path.stat().st_mtime <= self.ttl_hours * 3600
 
 
-def memoize(ttl_hours: float = 6.0):
-    """Decorator to cache function results by file key."""
+def memoize(ttl_hours: float = 6.0, cache_dir: str | Path | None = None):
+    """Decorator to cache function results by file key.
+
+    Args:
+        ttl_hours: Cache time-to-live in hours.
+        cache_dir: Directory to store cache files. Defaults to a
+            ``barograph_cache`` directory in the system temp location.
+    """
+    import tempfile
+
+    target_dir = cache_dir or Path(tempfile.gettempdir()) / "barograph_cache"
+
     def decorator(func):
-        cache = TTLCache("./cache", ttl_hours)
+        cache = TTLCache(target_dir, ttl_hours)
 
         def wrapper(*args, **kwargs):
             key = f"{func.__module__}.{func.__name__}:{args}:{sorted(kwargs.items())}"

@@ -141,12 +141,12 @@ class EnsembleForecast:
 @dataclass
 class PointForecast:
     """Forecast at a single point."""
-    coord: Coordinate
-    variable: Variable
+    coord: Coordinate | None
+    variable: Variable | None
     values: list[float]
     times: list[datetime]
-    source: ModelSource
-    init_time: datetime
+    source: ModelSource | None
+    init_time: datetime | None
     member_id: int | None = None
     meta: dict[str, Any] = field(default_factory=dict)
 

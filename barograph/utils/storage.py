@@ -43,18 +43,29 @@ def load_gridded_field(path: str | Path) -> GriddedField:
     from datetime import datetime
 
     from barograph.core.models import GriddedField, ModelSource, Variable
+    from barograph.core.temporal import utcnow
 
     ds = xr.open_dataset(path)
     data = ds["data"].values
 
-    variable = Variable(ds.attrs.get("variable", "temperature"))
-    source = ModelSource(ds.attrs.get("source", "gfs"))
+    variable = Variable.from_value(str(ds.attrs.get("variable", "temperature")))
+    try:
+        source = ModelSource(str(ds.attrs.get("source", "gfs")))
+    except ValueError:
+        source = ModelSource.GFS
 
-    valid_time = datetime.fromisoformat(ds.attrs.get("valid_time", datetime.utcnow().isoformat()))
-    init_time = datetime.fromisoformat(ds.attrs.get("init_time", valid_time.isoformat()))
+    valid_time = datetime.fromisoformat(
+        ds.attrs.get("valid_time", utcnow().isoformat())
+    )
+    init_time = datetime.fromisoformat(
+        ds.attrs.get("init_time", valid_time.isoformat())
+    )
 
     level = ds.attrs.get("level")
-    level = float(level) if level not in (None, "None", "") else None
+    try:
+        level = float(level) if level not in (None, "None", "") else None  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        level = None
 
     return GriddedField(
         data=data,

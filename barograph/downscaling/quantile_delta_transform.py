@@ -68,6 +68,8 @@ class QDTDownscaler(BaseDownscaler):
     def transform(self, coarse: GriddedField) -> GriddedField:
         if not self._fitted:
             raise RuntimeError("QDTDownscaler must be fit before transform.")
+        if self._coarse_quantiles is None or self._fine_quantiles is None:
+            raise RuntimeError("QDTDownscaler is not fitted.")
 
         result = np.empty_like(coarse.data, dtype=np.float32)
         ny, nx = coarse.data.shape[-2:]

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -10,6 +9,7 @@ import xarray as xr
 from loguru import logger
 
 from barograph.core.models import RadarSweep
+from barograph.core.temporal import utcnow
 
 
 class RadarIngester:
@@ -30,19 +30,19 @@ class RadarIngester:
         elif "dbz" in ds.data_vars:
             refl_var = "dbz"
         else:
-            refl_var = list(ds.data_vars.keys())[0]
+            refl_var = str(list(ds.data_vars.keys())[0])
 
         data = ds[refl_var].values
         if data.ndim == 3:
             data = data[0]
 
-        lat_dim = next((d for d in ds[refl_var].dims if "lat" in d.lower()), None)
-        lon_dim = next((d for d in ds[refl_var].dims if "lon" in d.lower()), None)
+        lat_dim = next((d for d in ds[refl_var].dims if "lat" in str(d).lower()), None)
+        lon_dim = next((d for d in ds[refl_var].dims if "lon" in str(d).lower()), None)
 
         lats = ds[lat_dim].values if lat_dim else np.linspace(-90, 90, data.shape[-2])
         lons = ds[lon_dim].values if lon_dim else np.linspace(-180, 180, data.shape[-1])
 
-        scan_time = datetime.utcnow()
+        scan_time = utcnow()
         for key in ["time", "scan_time", "datetime"]:
             if key in ds.coords:
                 scan_time = ds[key].values.item()

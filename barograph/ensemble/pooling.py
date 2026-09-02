@@ -91,7 +91,7 @@ class EnsemblePooler:
                 )
         return out
 
-    def cdf(self, params: dict[str, np.ndarray], x: np.ndarray) -> np.ndarray:
+    def cdf(self, params: dict[str, np.ndarray], x: float | np.ndarray) -> np.ndarray:
         """Evaluate the CDF at given values."""
         from scipy import stats
         mean = params["mean"]

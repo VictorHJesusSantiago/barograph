@@ -35,7 +35,7 @@ class EMOSCalibrator:
         self.max_iter = max_iter
         self._params: np.ndarray | None = None
         self._fitted = False
-        self._spatial_dim = None
+        self._spatial_dim: tuple[int, ...] | None = None
 
     def _nps(self, z):
         """Normalized CRPS contribution for a single scalar ensemble.
@@ -129,6 +129,8 @@ class EMOSCalibrator:
         """Return calibrated forecast location and scale arrays."""
         if not self._fitted:
             raise RuntimeError("Must fit before predict.")
+        if self._params is None:
+            raise RuntimeError("EMOS calibration parameters are unavailable.")
 
         ens_mean = np.asarray(ens_mean, dtype=np.float64)
         ens_var = np.asarray(ens_var, dtype=np.float64)

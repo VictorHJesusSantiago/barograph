@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pickle
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -25,7 +26,7 @@ class MOSRegressor:
     ):
         self.algorithm = algorithm
         self.hyperparameters = hyperparameters or {}
-        self._model = None
+        self._model: Any | None = None
         self._feature_names: list[str] | None = None
         self._fitted = False
 
@@ -76,6 +77,8 @@ class MOSRegressor:
             raise ValueError("Target y contains NaN values")
 
         self._model = self._build_model()
+        if self._model is None:
+            raise RuntimeError("Could not build model")
         self._model.fit(X, y)
         self._feature_names = feature_names
         self._fitted = True
@@ -83,7 +86,7 @@ class MOSRegressor:
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Predict calibrated values."""
-        if not self._fitted:
+        if not self._fitted or self._model is None:
             raise RuntimeError("MOSRegressor must be fit before predict.")
         X = np.asarray(X, dtype=np.float64)
         if X.ndim == 1:
@@ -109,9 +112,9 @@ class MOSRegressor:
             meta={"station_id": station_id, "algorithm": self.algorithm},
         )
 
-    def feature_importance(self) -> np.ndarray | None:
+    def feature_importance(self) -> np.ndarray | Any | None:
         """Return feature importances if the model supports them."""
-        if not self._fitted:
+        if not self._fitted or self._model is None:
             return None
         if hasattr(self._model, "feature_importances_"):
             return self._model.feature_importances_

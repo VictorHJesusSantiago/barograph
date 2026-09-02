@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from barograph.core.models import GriddedField
+from barograph.core.models import Coordinate, GriddedField
 from barograph.downscaling.base import BaseDownscaler
 from barograph.mos.regressor import MOSRegressor
 
@@ -73,7 +73,7 @@ class MOSDownscaler(BaseDownscaler):
     ) -> np.ndarray:
         from barograph.core.coordinates import find_nearest_grid_point
         i, j = find_nearest_grid_point(
-            {"latitude": coord[0], "longitude": coord[1]},
+            Coordinate(latitude=coord[0], longitude=coord[1]),
             field.lats,
             field.lons,
         )

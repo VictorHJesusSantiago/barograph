@@ -12,6 +12,7 @@ from loguru import logger
 
 from barograph.core.config import IngestionConfig
 from barograph.core.models import GriddedField, ModelSource, Variable
+from barograph.core.temporal import utcnow
 
 
 class ERA5Ingester:
@@ -44,7 +45,7 @@ class ERA5Ingester:
         var_name = self.CDS_VARIABLE_MAP.get(variable, variable)
         if var_name not in ds.data_vars:
             if len(ds.data_vars) > 0:
-                var_name = list(ds.data_vars.keys())[0]
+                var_name = str(list(ds.data_vars.keys())[0])
             else:
                 raise ValueError(f"No data variables found in {file_path}")
 
@@ -137,15 +138,15 @@ class ERA5Ingester:
         else:
             data = ds_var.values
             var_enum = Variable.from_value(variable)
-            t = datetime.utcnow()
+            now = utcnow()
             results.append(GriddedField(
                 data=data.astype(np.float32),
                 lats=lats.astype(np.float32),
                 lons=lons.astype(np.float32),
                 variable=var_enum,
                 source=ModelSource.ERA5,
-                init_time=t,
-                valid_time=t,
+                init_time=now,
+                valid_time=now,
             ))
 
         return results
@@ -193,4 +194,4 @@ class ERA5Ingester:
         for key in ["time", "valid_time", "forecast_reference_time"]:
             if key in ds.coords:
                 return ds[key].values.item()
-        return datetime.utcnow()
+        return utcnow()

@@ -2,9 +2,19 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import numpy as np
+
+
+def utcnow() -> datetime:
+    """Return the current UTC time as a naive datetime.
+
+    Avoids the deprecated ``datetime.utcnow()`` (removed in Python 3.14+).
+    The result is naive (no tzinfo) to stay compatible with the rest of the
+    codebase which stores naive UTC datetimes.
+    """
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 def temporal_interpolate(
@@ -19,6 +29,7 @@ def temporal_interpolate(
     times_numeric = np.array([(t - times[0]).total_seconds() for t in times])
     target_numeric = np.array([(t - times[0]).total_seconds() for t in target_times])
 
+    fill_value: str | tuple[float, float]
     if method == "linear":
         fill_value = "extrapolate"
     else:
@@ -35,6 +46,7 @@ def resample_temporal(
     method: str = "mean",
 ) -> tuple[np.ndarray, list[datetime]]:
     """Resample temporally to a coarser time step."""
+    data = np.asarray(data, dtype=np.float64)
     if len(src_times) < 2:
         return data, src_times
 
@@ -46,7 +58,7 @@ def resample_temporal(
     ]
 
     if data.ndim == 1:
-        result = np.zeros(len(target_times))
+        result = np.zeros(len(target_times), dtype=np.float64)
         for k, t_start in enumerate(target_times):
             t_end = t_start + timedelta(hours=target_step_hours)
             mask = np.array(
