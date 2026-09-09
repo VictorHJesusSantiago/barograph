@@ -59,5 +59,29 @@ alerts:
   notification_channels: ["log", "stdout"]
   webhook_urls: []
 
+raster:
+  input_dir: "./data/raster"
+  output_dir: "./output/raster"
+  default_crs: 4326
+  nodata: -9999.0
+  resample_method: "nearest"
+
+notifications:
+  channels: ["console"]
+  webhook_url: ""
+  max_retries: 3
+  backoff_base: 1.0
+  timeout_seconds: 5.0
+  file_path: "./logs/notifications.jsonl"
+  smtp_host: ""
+  smtp_port: 587
+
+output:
+  format: "netcdf"
+  base_dir: "./output"
+  render_png: false
+  png_dpi: 100
+  cmap: "viridis"
+
 log_level: "INFO"
 n_workers: 4
