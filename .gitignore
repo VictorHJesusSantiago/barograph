@@ -15,6 +15,9 @@ htmlcov/
 coverage.xml
 .tox/
 
+# Docs build
+docs/_build/
+
 # Environments
 .venv/
 venv/
