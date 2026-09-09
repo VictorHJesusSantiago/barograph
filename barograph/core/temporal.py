@@ -57,18 +57,20 @@ def resample_temporal(
         for i in range(n_steps)
     ]
 
-    if data.ndim == 1:
-        result = np.zeros(len(target_times), dtype=np.float64)
-        for k, t_start in enumerate(target_times):
-            t_end = t_start + timedelta(hours=target_step_hours)
-            mask = np.array(
-                [(t_start <= t < t_end) for t in src_times]
-            )
-            if np.any(mask):
-                result[k] = np.mean(data[mask]) if method == "mean" else np.sum(data[mask])
-        return result, target_times
+    result_shape = (len(target_times),) + data.shape[1:]
+    result = np.zeros(result_shape, dtype=np.float64)
 
-    raise ValueError("Only 1D temporal resampling is currently supported")
+    for k, t_start in enumerate(target_times):
+        t_end = t_start + timedelta(hours=target_step_hours)
+        mask = np.array([(t_start <= t < t_end) for t in src_times])
+        if np.any(mask):
+            chunk = data[mask]
+            if method == "mean":
+                result[k] = np.mean(chunk, axis=0)
+            else:
+                result[k] = np.sum(chunk, axis=0)
+
+    return result, target_times
 
 
 def time_weights(times: list[datetime]) -> np.ndarray:
