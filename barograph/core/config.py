@@ -91,6 +91,36 @@ class AlertsConfig:
 
 
 @dataclass
+class RasterConfig:
+    input_dir: str = "./data/raster"
+    output_dir: str = "./output/raster"
+    default_crs: int = 4326
+    nodata: float = -9999.0
+    resample_method: str = "nearest"
+
+
+@dataclass
+class NotificationsConfig:
+    channels: list[str] = field(default_factory=lambda: ["console"])
+    webhook_url: str = ""
+    max_retries: int = 3
+    backoff_base: float = 1.0
+    timeout_seconds: float = 5.0
+    file_path: str = "./logs/notifications.jsonl"
+    smtp_host: str = ""
+    smtp_port: int = 587
+
+
+@dataclass
+class OutputConfig:
+    format: str = "netcdf"
+    base_dir: str = "./output"
+    render_png: bool = False
+    png_dpi: int = 100
+    cmap: str = "viridis"
+
+
+@dataclass
 class Settings:
     ingestion: IngestionConfig = field(default_factory=IngestionConfig)
     downscaling: DownscalingConfig = field(default_factory=DownscalingConfig)
@@ -100,6 +130,9 @@ class Settings:
     verification: VerificationConfig = field(default_factory=VerificationConfig)
     nowcasting: NowcastingConfig = field(default_factory=NowcastingConfig)
     alerts: AlertsConfig = field(default_factory=AlertsConfig)
+    raster: RasterConfig = field(default_factory=RasterConfig)
+    notifications: NotificationsConfig = field(default_factory=NotificationsConfig)
+    output: OutputConfig = field(default_factory=OutputConfig)
     log_level: str = "INFO"
     n_workers: int = 4
 
@@ -125,6 +158,7 @@ def load_config(path: str | Path | None = None) -> Settings:
         for section_name in [
             "ingestion", "downscaling", "mos", "ensemble",
             "postprocessing", "verification", "nowcasting", "alerts",
+            "raster", "notifications", "output",
         ]:
             if section_name in raw:
                 section = getattr(settings, section_name)
