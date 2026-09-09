@@ -72,8 +72,7 @@ def memoize(ttl_hours: float = 6.0, cache_dir: str | Path | None = None):
 
     Args:
         ttl_hours: Cache time-to-live in hours.
-        cache_dir: Directory to store cache files. Defaults to a
-            ``barograph_cache`` directory in the system temp location.
+        cache_dir: Directory for cache files (default: barograph_cache in tmp).
     """
     import tempfile
 
