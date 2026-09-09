@@ -25,7 +25,7 @@ def crps_ensemble(members: np.ndarray, obs: np.ndarray) -> np.ndarray:
     """CRPS for an ensemble forecast (empirical distribution).
 
     Uses the standard fair CRPS formula for an N-member ensemble:
-      CRPS = (2/N) * sum |x_i - o| - (1/N^2) * sum_i sum_j |x_i - x_j|
+      CRPS = (2/N) * sum abs(x_i - o) - (1/N^2) * sum_i sum_j abs(x_i - x_j)
 
     A correction (1/N) is added to get the fair score (unbiased).
     """
