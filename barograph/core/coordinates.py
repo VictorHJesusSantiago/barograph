@@ -73,14 +73,44 @@ def reproject_field(
             data = data[..., ::-1]
         src_lons = src_lons_sorted
 
+    if dst_lats.ndim == 1:
+        dst_mesh_lats, dst_mesh_lons = np.meshgrid(
+            dst_lats, dst_lons, indexing="ij", copy=False,
+        )
+    else:
+        dst_mesh_lats, dst_mesh_lons = dst_lats, dst_lons
+
+    dst_grid = np.column_stack(
+        [np.asarray(dst_mesh_lats).ravel(), np.asarray(dst_mesh_lons).ravel()]
+    )
+    out_shape = np.asarray(dst_mesh_lats).shape
+
     if data.ndim == 2:
         interp = RegularGridInterpolator(
-            (src_lats, src_lons), data, method=method, bounds_error=False
+            (src_lats, src_lons), data, method=method, bounds_error=False,
         )
-        dst_grid = np.column_stack([dst_lats.ravel(), dst_lons.ravel()])
-        result = interp(dst_grid).reshape(dst_lats.shape)
+        result = interp(dst_grid).reshape(out_shape)
+    elif data.ndim == 3:
+        n_time = data.shape[0]
+        result = np.empty((n_time, out_shape[0], out_shape[1]), dtype=data.dtype)
+        for t in range(n_time):
+            interp = RegularGridInterpolator(
+                (src_lats, src_lons), data[t], method=method, bounds_error=False,
+            )
+            result[t] = interp(dst_grid).reshape(out_shape)
+    elif data.ndim == 4:
+        n_time, n_level = data.shape[0], data.shape[1]
+        result = np.empty(
+            (n_time, n_level, out_shape[0], out_shape[1]), dtype=data.dtype,
+        )
+        for t in range(n_time):
+            for k in range(n_level):
+                interp = RegularGridInterpolator(
+                    (src_lats, src_lons), data[t, k], method=method, bounds_error=False,
+                )
+                result[t, k] = interp(dst_grid).reshape(out_shape)
     else:
-        raise ValueError("Only 2D reprojection is currently supported")
+        raise ValueError(f"Unsupported ndim={data.ndim} for reprojection")
 
     return result
 
