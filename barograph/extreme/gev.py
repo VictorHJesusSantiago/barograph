@@ -29,8 +29,7 @@ class GEVDistribution:
 
     def cdf(self, x: np.ndarray) -> np.ndarray:
         """Return the GEV cumulative probability at *x*."""
-        return gevcdf(np.asarray(x, dtype=np.float64), self.loc, self.scale,
-                      self.shape)
+        return gevcdf(np.asarray(x, dtype=np.float64), self.loc, self.scale, self.shape)
 
     def quantile(self, p: np.ndarray) -> np.ndarray:
         """Return the quantile for probability *p* (inverse CDF)."""
@@ -46,9 +45,7 @@ class GEVDistribution:
         return return_level(self, period)
 
 
-def gevcdf(
-    x: np.ndarray, loc: float, scale: float, shape: float
-) -> np.ndarray:
+def gevcdf(x: np.ndarray, loc: float, scale: float, shape: float) -> np.ndarray:
     """Evaluate the GEV cumulative distribution function."""
     x = np.asarray(x, dtype=np.float64)
     if scale <= 0:
@@ -58,7 +55,7 @@ def gevcdf(
         return np.exp(-np.exp(-z))
     z = 1.0 + shape * (x - loc) / scale
     with np.errstate(invalid="ignore", divide="ignore"):
-        return np.where(z > 0, np.exp(-z ** (-1.0 / shape)), np.nan)
+        return np.where(z > 0, np.exp(-(z ** (-1.0 / shape))), np.nan)
 
 
 def _l_moments(samples: np.ndarray) -> tuple[float, float, float]:
@@ -75,8 +72,7 @@ def _l_moments(samples: np.ndarray) -> tuple[float, float, float]:
     # second and third probability weighted moments (Hosking convention)
     b1 = np.mean(x * (np.arange(1, n + 1) - 1.0) / (n - 1.0))
     b2 = np.mean(
-        x * (np.arange(1, n + 1) - 1.0) * (np.arange(1, n + 1) - 2.0)
-        / ((n - 1.0) * (n - 2.0))
+        x * (np.arange(1, n + 1) - 1.0) * (np.arange(1, n + 1) - 2.0) / ((n - 1.0) * (n - 2.0))
     )
     l1 = b0
     l2 = 2.0 * b1 - b0
@@ -85,9 +81,7 @@ def _l_moments(samples: np.ndarray) -> tuple[float, float, float]:
     return l1, l2, tau3
 
 
-def _gev_param_from_lmoments(
-    loc: float, scale: float, tau3: float
-) -> tuple[float, float, float]:
+def _gev_param_from_lmoments(loc: float, scale: float, tau3: float) -> tuple[float, float, float]:
     """Invert GEV parameters from L-moments (Hosking et al., 1985).
 
     The GEV parameter recovery uses the exact theoretical relations between
@@ -170,9 +164,7 @@ class GEVFit:
         return self.distribution.return_level(period)
 
 
-def fit_gev(
-    samples: np.ndarray, block_size: int | None = None
-) -> GEVFit:
+def fit_gev(samples: np.ndarray, block_size: int | None = None) -> GEVFit:
     """Fit a GEV distribution to a sample of block maxima by L-moments."""
     values = np.asarray(samples, dtype=np.float64)
     values = values[np.isfinite(values)]
@@ -189,9 +181,7 @@ def fit_gev(
     )
 
 
-def return_level_of_probability(
-    dist: GEVDistribution, p: np.ndarray
-) -> np.ndarray:
+def return_level_of_probability(dist: GEVDistribution, p: np.ndarray) -> np.ndarray:
     """Return level associated with non-exceedance probability *p*."""
     return dist.quantile(p)
 
@@ -217,9 +207,7 @@ def return_period(dist: GEVDistribution, level: np.ndarray) -> np.ndarray:
         return np.where(p < 1.0, 1.0 / (1.0 - p), np.inf)
 
 
-def return_period_of_level(
-    dist: GEVDistribution, level: np.ndarray
-) -> np.ndarray:
+def return_period_of_level(dist: GEVDistribution, level: np.ndarray) -> np.ndarray:
     """Alias of :func:`return_period` for a single level."""
     return return_period(dist, level)
 

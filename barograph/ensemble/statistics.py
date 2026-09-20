@@ -28,9 +28,13 @@ class EnsembleStatistics:
         data = q75 - q25
         ref = ens.members[0]
         return GriddedField(
-            data=data, lats=ref.lats, lons=ref.lons,
-            variable=ens.variable, source=ens.source,
-            valid_time=ens.valid_time, init_time=ens.init_time,
+            data=data,
+            lats=ref.lats,
+            lons=ref.lons,
+            variable=ens.variable,
+            source=ens.source,
+            valid_time=ens.valid_time,
+            init_time=ens.init_time,
         )
 
     @staticmethod
@@ -40,31 +44,35 @@ class EnsembleStatistics:
         return np.sum(arr < observation, axis=0).astype(np.float32)
 
     @staticmethod
-    def ensemble_percentile(
-        ens: EnsembleForecast, percentile: float
-    ) -> GriddedField:
+    def ensemble_percentile(ens: EnsembleForecast, percentile: float) -> GriddedField:
         """Field of a specific percentile across members."""
         arr = ens.member_array
         data = np.percentile(arr, percentile, axis=0)
         ref = ens.members[0]
         return GriddedField(
-            data=data, lats=ref.lats, lons=ref.lons,
-            variable=ens.variable, source=ens.source,
-            valid_time=ens.valid_time, init_time=ens.init_time,
+            data=data,
+            lats=ref.lats,
+            lons=ref.lons,
+            variable=ens.variable,
+            source=ens.source,
+            valid_time=ens.valid_time,
+            init_time=ens.init_time,
         )
 
     @staticmethod
-    def probability_above(
-        ens: EnsembleForecast, threshold: float
-    ) -> GriddedField:
+    def probability_above(ens: EnsembleForecast, threshold: float) -> GriddedField:
         """Probability of exceeding a threshold, computed empirically."""
         arr = ens.member_array
         data = np.mean(arr > threshold, axis=0)
         ref = ens.members[0]
         return GriddedField(
-            data=data, lats=ref.lats, lons=ref.lons,
-            variable=ens.variable, source=ens.source,
-            valid_time=ens.valid_time, init_time=ens.init_time,
+            data=data,
+            lats=ref.lats,
+            lons=ref.lons,
+            variable=ens.variable,
+            source=ens.source,
+            valid_time=ens.valid_time,
+            init_time=ens.init_time,
         )
 
     @staticmethod
@@ -74,15 +82,17 @@ class EnsembleStatistics:
         data = np.nanmax(arr, axis=0)
         ref = ens.members[0]
         return GriddedField(
-            data=data, lats=ref.lats, lons=ref.lons,
-            variable=ens.variable, source=ens.source,
-            valid_time=ens.valid_time, init_time=ens.init_time,
+            data=data,
+            lats=ref.lats,
+            lons=ref.lons,
+            variable=ens.variable,
+            source=ens.source,
+            valid_time=ens.valid_time,
+            init_time=ens.init_time,
         )
 
     @staticmethod
-    def exceedance_fraction(
-        ens: EnsembleForecast, threshold: float
-    ) -> float:
+    def exceedance_fraction(ens: EnsembleForecast, threshold: float) -> float:
         """Fraction of the domain exceeding threshold (single scalar)."""
         return float(np.mean(ens.member_array > threshold))
 
