@@ -47,10 +47,9 @@ class MOSDownscaler(BaseDownscaler):
     ) -> MOSDownscaler:
         """Train per-station regressors."""
         for coord, sid, obs in zip(self.station_coords, self.station_ids, station_obs):
-            feat_matrix = np.array([
-                self._extract_neighborhood(f, coord).ravel()
-                for f in coarse_fields
-            ])
+            feat_matrix = np.array(
+                [self._extract_neighborhood(f, coord).ravel() for f in coarse_fields]
+            )
             reg = MOSRegressor()
             reg.fit(feat_matrix, np.array(obs))
             self.regressors[sid] = reg
@@ -72,6 +71,7 @@ class MOSDownscaler(BaseDownscaler):
         coord: tuple[float, float],
     ) -> np.ndarray:
         from barograph.core.coordinates import find_nearest_grid_point
+
         i, j = find_nearest_grid_point(
             Coordinate(latitude=coord[0], longitude=coord[1]),
             field.lats,

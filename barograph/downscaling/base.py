@@ -43,9 +43,7 @@ class BaseDownscaler(ABC):
         fine: list[GriddedField],
     ) -> None:
         if len(coarse) != len(fine):
-            raise ValueError(
-                f"Mismatched training samples: coarse={len(coarse)}, fine={len(fine)}"
-            )
+            raise ValueError(f"Mismatched training samples: coarse={len(coarse)}, fine={len(fine)}")
 
     def _aggregate_arrays(
         self, fields: list[GriddedField]
