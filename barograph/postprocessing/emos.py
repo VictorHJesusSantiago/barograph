@@ -43,7 +43,7 @@ class EMOSCalibrator:
         z is the standardized ensemble value assuming location = ens_mean.
         This helper only enables a closed-form gradient where constants apply.
         """
-        return z * erf(z / np.sqrt(2)) - np.sqrt(2 / np.pi) * (1 - np.exp(-z**2 / 2))
+        return z * erf(z / np.sqrt(2)) - np.sqrt(2 / np.pi) * (1 - np.exp(-(z**2) / 2))
 
     def crps_normal(
         self,
@@ -61,8 +61,9 @@ class EMOSCalibrator:
 
         mu = a1 + a2 * ens_mean
         z = (obs - mu) / scale
-        crps = scale * (z * (2 * stats.norm.cdf(z) - 1)
-                        + 2 * stats.norm.pdf(z) - 1 / np.sqrt(np.pi))
+        crps = scale * (
+            z * (2 * stats.norm.cdf(z) - 1) + 2 * stats.norm.pdf(z) - 1 / np.sqrt(np.pi)
+        )
         return float(np.mean(crps))
 
     def fit(
@@ -112,9 +113,14 @@ class EMOSCalibrator:
                 return self.crps_normal(p, m[valid], v[valid], o[valid])
 
             result = optimize.minimize(
-                loss, p0, method="Nelder-Mead",
-                options={"maxiter": self.max_iter,
-                         "xatol": self.tolerance, "fatol": self.tolerance},
+                loss,
+                p0,
+                method="Nelder-Mead",
+                options={
+                    "maxiter": self.max_iter,
+                    "xatol": self.tolerance,
+                    "fatol": self.tolerance,
+                },
             )
             self._params[:, k] = result.x
 
@@ -199,6 +205,7 @@ class EMOSCalibrator:
         """Average CRPS of the calibrated forecast points against obs."""
         loc, scale = self.predict_distribution(ens_mean, ens_var)
         z = (obs - loc) / scale
-        crps = scale * (z * (2 * stats.norm.cdf(z) - 1)
-                        + 2 * stats.norm.pdf(z) - 1 / np.sqrt(np.pi))
+        crps = scale * (
+            z * (2 * stats.norm.cdf(z) - 1) + 2 * stats.norm.pdf(z) - 1 / np.sqrt(np.pi)
+        )
         return float(np.mean(crps))
