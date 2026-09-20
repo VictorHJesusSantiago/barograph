@@ -89,7 +89,7 @@ class OpenMeteo:
             latitude=latitude,
             longitude=longitude,
             current="temperature_2m,relative_humidity_2m,wind_speed_10m,"
-                    "wind_direction_10m,precipitation,weather_code",
+            "wind_direction_10m,precipitation,weather_code",
         )
         cur = payload.get("current", {})
         cur_time = _parse_single_time(cur.get("time"))
@@ -143,8 +143,7 @@ class OpenMeteo:
             f"{self.base_url}/forecast",
             latitude=latitude,
             longitude=longitude,
-            daily="temperature_2m_max,temperature_2m_min,"
-                  "precipitation_sum,wind_speed_10m_max",
+            daily="temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max",
             forecast_days=forecast_days,
             past_days=past_days,
             timezone="UTC",

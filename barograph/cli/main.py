@@ -17,8 +17,9 @@ from barograph.utils.logging import setup_logging
 
 
 @click.group()
-@click.option("--config", "-c", type=click.Path(exists=True), default=None,
-              help="Path to YAML config file.")
+@click.option(
+    "--config", "-c", type=click.Path(exists=True), default=None, help="Path to YAML config file."
+)
 @click.option("--verbose", "-v", is_flag=True, help="Enable debug logging.")
 @click.pass_context
 def cli(ctx: click.Context, config: str | None, verbose: bool) -> None:
@@ -40,8 +41,13 @@ def _echo_title(text: str) -> None:
 @cli.command()
 @click.option("--gfs-file", type=click.Path(exists=True), help="Path to GFS GRIB2 file.")
 @click.option("--ecmwf-file", type=click.Path(exists=True), help="Path to ECMWF GRIB file.")
-@click.option("--variable", "-var", required=True, default="temperature",
-              help="Variable name (temperature, precipitation, ...).")
+@click.option(
+    "--variable",
+    "-var",
+    required=True,
+    default="temperature",
+    help="Variable name (temperature, precipitation, ...).",
+)
 @click.pass_context
 def ingest(ctx, gfs_file, ecmwf_file, variable):
     """Ingest and parse NWP model files."""
@@ -49,18 +55,22 @@ def ingest(ctx, gfs_file, ecmwf_file, variable):
 
     if gfs_file:
         from barograph.ingestion import GFSIngester
+
         ingester = GFSIngester(settings.ingestion)
         field = ingester.parse_grib(gfs_file, variable)
-        click.echo(f"Parsed GFS: {field.shape} | var={field.variable.value} | "
-                   f"valid={field.valid_time}")
+        click.echo(
+            f"Parsed GFS: {field.shape} | var={field.variable.value} | valid={field.valid_time}"
+        )
         ctx.obj["last_field"] = field
 
     if ecmwf_file:
         from barograph.ingestion import ECMWFIngester
+
         ingester = ECMWFIngester(settings.ingestion)
         field = ingester.parse_grib(ecmwf_file, variable)
-        click.echo(f"Parsed ECMWF: {field.shape} | var={field.variable.value} | "
-                   f"valid={field.valid_time}")
+        click.echo(
+            f"Parsed ECMWF: {field.shape} | var={field.variable.value} | valid={field.valid_time}"
+        )
         ctx.obj["last_field"] = field
 
     if not gfs_file and not ecmwf_file:
@@ -69,10 +79,10 @@ def ingest(ctx, gfs_file, ecmwf_file, variable):
 
 
 @cli.command()
-@click.option("--field", "-f", type=click.Path(exists=True),
-              help="Path to a saved forecast NetCDF.")
-@click.option("--variable", "-var", default="precipitation",
-              help="Variable to downscale.")
+@click.option(
+    "--field", "-f", type=click.Path(exists=True), help="Path to a saved forecast NetCDF."
+)
+@click.option("--variable", "-var", default="precipitation", help="Variable to downscale.")
 @click.pass_context
 def downscale(ctx, field, variable):
     """Statistically downscale a coarse forecast using QDT or bias correction."""
@@ -89,30 +99,36 @@ def downscale(ctx, field, variable):
 
     method = settings.downscaling.method
     if method == "quantile_delta_transform":
-        click.echo(f"Requested QDT downscaling of {coarse_field.variable.value} "
-                   f"({coarse_field.shape})")
+        click.echo(
+            f"Requested QDT downscaling of {coarse_field.variable.value} ({coarse_field.shape})"
+        )
     else:
-        click.echo(f"Bias correction downscaling requested for {variable} "
-                   f"({coarse_field.shape})")
+        click.echo(f"Bias correction downscaling requested for {variable} ({coarse_field.shape})")
 
 
 @cli.command()
-@click.option("--field", "-f", type=click.Path(exists=True),
-              help="Path to saved NetCDF field to check.")
+@click.option(
+    "--field", "-f", type=click.Path(exists=True), help="Path to saved NetCDF field to check."
+)
 @click.option("--threshold", type=float, required=True)
 @click.option("--variable", "-var", default="precipitation")
-@click.option("--lat-range", type=(float, float), default=None,
-              help="Latitude min,max for region.")
-@click.option("--lon-range", type=(float, float), default=None,
-              help="Longitude min,max for region.")
-@click.option("--format", "-fmt", "out_format", type=click.Choice(
-    ["json", "csv", "markdown", "netcdf"]), default="json",
-    help="Output format for the alert report.")
-@click.option("--output", "-o", type=click.Path(), default=None,
-              help="Output file for the alert report.")
+@click.option("--lat-range", type=(float, float), default=None, help="Latitude min,max for region.")
+@click.option(
+    "--lon-range", type=(float, float), default=None, help="Longitude min,max for region."
+)
+@click.option(
+    "--format",
+    "-fmt",
+    "out_format",
+    type=click.Choice(["json", "csv", "markdown", "netcdf"]),
+    default="json",
+    help="Output format for the alert report.",
+)
+@click.option(
+    "--output", "-o", type=click.Path(), default=None, help="Output file for the alert report."
+)
 @click.pass_context
-def check_alerts(ctx, field, threshold, variable, lat_range, lon_range,
-                 out_format, output):
+def check_alerts(ctx, field, threshold, variable, lat_range, lon_range, out_format, output):
     """Check a gridded forecast against threshold alert rules."""
     from barograph.alerts import AlertEngine
     from barograph.alerts.rules import AlertRule, Operator, Severity
@@ -145,23 +161,28 @@ def check_alerts(ctx, field, threshold, variable, lat_range, lon_range,
 
     if alerts and output:
         from barograph.reports.renderer import ReportRenderer
+
         if out_format == "json":
             ReportRenderer.alerts_to_json(alerts, output)
         elif out_format == "csv":
             ReportRenderer.alerts_to_csv(alerts, output)
         elif out_format == "markdown":
-            Path(output).write_text(ReportRenderer.alerts_to_markdown(alerts),
-                                    encoding="utf-8")
+            Path(output).write_text(ReportRenderer.alerts_to_markdown(alerts), encoding="utf-8")
         click.echo(f"Report written to {output}")
 
 
 @cli.command()
-@click.option("--members-dir", "-d", type=click.Path(exists=True),
-              help="Directory of member NetCDF files.")
-@click.option("--metric", "-m", default="crps",
-              help="Verification metric to compute.")
-@click.option("--dashboard", "-db", type=click.Path(), default=None,
-              help="Path to write a verification dashboard (JSON or .html).")
+@click.option(
+    "--members-dir", "-d", type=click.Path(exists=True), help="Directory of member NetCDF files."
+)
+@click.option("--metric", "-m", default="crps", help="Verification metric to compute.")
+@click.option(
+    "--dashboard",
+    "-db",
+    type=click.Path(),
+    default=None,
+    help="Path to write a verification dashboard (JSON or .html).",
+)
 @click.pass_context
 def verify(ctx, members_dir, metric, dashboard):
     """Run verification on forecast ensembles and emit a dashboard."""
@@ -169,9 +190,9 @@ def verify(ctx, members_dir, metric, dashboard):
     click.echo(f"Verification requested with metric={metric}, dir={members_dir}")
     if dashboard:
         from barograph.reports.dashboard import VerificationDashboard
+
         db = VerificationDashboard(title="Barograph Verification")
-        db.add_metrics("demo",
-                       {"mae": 1.2, "rmse": 1.8, "bias": 0.4, "correlation": 0.93})
+        db.add_metrics("demo", {"mae": 1.2, "rmse": 1.8, "bias": 0.4, "correlation": 0.93})
         db.add_series("demo", {"mae": [1.1, 1.3, 1.2, 1.0]})
         out = Path(dashboard)
         if out.suffix == ".html":
@@ -182,10 +203,10 @@ def verify(ctx, members_dir, metric, dashboard):
 
 
 @cli.command()
-@click.option("--radar-dir", "-r", type=click.Path(exists=True),
-              help="Directory of radar sweep NetCDF files.")
-@click.option("--lead-minutes", "-l", default=60,
-              help="Lead time in minutes for nowcast.")
+@click.option(
+    "--radar-dir", "-r", type=click.Path(exists=True), help="Directory of radar sweep NetCDF files."
+)
+@click.option("--lead-minutes", "-l", default=60, help="Lead time in minutes for nowcast.")
 @click.pass_context
 def nowcast(ctx, radar_dir, lead_minutes):
     """Run radar nowcasting via optical flow."""
@@ -202,18 +223,19 @@ def nowcast(ctx, radar_dir, lead_minutes):
 
     ext = Extrapolator()
     u, v, dt_hours = ext.estimate_motion(sweeps)
-    click.echo(f"Estimated motion: mean_u={u.mean():.3f} px/h, "
-               f"mean_v={v.mean():.3f} px/h, dt={dt_hours:.2f}h")
+    click.echo(
+        f"Estimated motion: mean_u={u.mean():.3f} px/h, "
+        f"mean_v={v.mean():.3f} px/h, dt={dt_hours:.2f}h"
+    )
 
     from datetime import timedelta
+
     results = ext.nowcast(sweeps, [timedelta(minutes=lead_minutes)])
-    click.echo(f"Nowcast produced for +{lead_minutes} min: "
-               f"shape={results[0].shape}")
+    click.echo(f"Nowcast produced for +{lead_minutes} min: shape={results[0].shape}")
 
 
 @cli.command()
-@click.option("--rule-file", "-r", type=click.Path(exists=True),
-              help="YAML file of alert rules.")
+@click.option("--rule-file", "-r", type=click.Path(exists=True), help="YAML file of alert rules.")
 @click.pass_context
 def load_rules(ctx, rule_file):
     """Load alert rules from a YAML file."""
@@ -233,12 +255,20 @@ def raster():
 
 
 @raster.command("summary")
-@click.option("--file", "-f", "path", type=click.Path(exists=True), required=True,
-              help="Path to a NetCDF/PyNIO raster file.")
-@click.option("--lat", type=click.FloatRange(-90, 90), default=None,
-              help="Latitude of a point to sample.")
-@click.option("--lon", type=click.FloatRange(-180, 180), default=None,
-              help="Longitude of a point to sample.")
+@click.option(
+    "--file",
+    "-f",
+    "path",
+    type=click.Path(exists=True),
+    required=True,
+    help="Path to a NetCDF/PyNIO raster file.",
+)
+@click.option(
+    "--lat", type=click.FloatRange(-90, 90), default=None, help="Latitude of a point to sample."
+)
+@click.option(
+    "--lon", type=click.FloatRange(-180, 180), default=None, help="Longitude of a point to sample."
+)
 @click.pass_context
 def raster_summary(ctx, path, lat, lon):
     """Print a summary of a raster layer, optionally sampling a point."""
@@ -253,17 +283,25 @@ def raster_summary(ctx, path, lat, lon):
 
 
 @raster.command("rainfall")
-@click.option("--file", "-f", "path", type=click.Path(exists=True), required=True,
-              help="dBZ raster file.")
-@click.option("--output", "-o", type=click.Path(), default=None,
-              help="Where to write the rainfall-rate raster.")
-@click.option("--format", "-fmt", "fmt", type=click.Choice(
-    ["netcdf", "npy", "json"]), default="netcdf")
+@click.option(
+    "--file", "-f", "path", type=click.Path(exists=True), required=True, help="dBZ raster file."
+)
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(),
+    default=None,
+    help="Where to write the rainfall-rate raster.",
+)
+@click.option(
+    "--format", "-fmt", "fmt", type=click.Choice(["netcdf", "npy", "json"]), default="netcdf"
+)
 @click.pass_context
 def raster_rainfall(ctx, path, output, fmt):
     """Convert a radar dBZ raster to rainfall rate (Z-R)."""
     from barograph.output.serializers import OutputWriter
     from barograph.raster.reflectivity import Reflectivity
+
     layer = _load_raster(path)
     rate = Reflectivity().to_raster(layer)
     used = settings(ctx).output
@@ -276,11 +314,16 @@ def raster_rainfall(ctx, path, output, fmt):
 
 
 @raster.command("terrain")
-@click.option("--file", "-f", "path", type=click.Path(exists=True), required=True,
-              help="DEM raster file.")
-@click.option("--variable", "-v", "voi", type=click.Choice(
-    ["slope", "aspect", "curvature", "hillshade", "ruggedness"]),
-    default="slope")
+@click.option(
+    "--file", "-f", "path", type=click.Path(exists=True), required=True, help="DEM raster file."
+)
+@click.option(
+    "--variable",
+    "-v",
+    "voi",
+    type=click.Choice(["slope", "aspect", "curvature", "hillshade", "ruggedness"]),
+    default="slope",
+)
 @click.option("--output", "-o", type=click.Path(), default=None)
 @click.pass_context
 def raster_terrain(ctx, path, voi, output):
@@ -293,8 +336,7 @@ def raster_terrain(ctx, path, voi, output):
     dem = _load_raster(path)
     func = getattr(Terrain, voi)
     result = func(dem)
-    layer = RasterLayer(data=result[np.newaxis, ...], lats=dem.lats, lons=dem.lons,
-                        name=voi)
+    layer = RasterLayer(data=result[np.newaxis, ...], lats=dem.lats, lons=dem.lons, name=voi)
     if output:
         writer = OutputWriter(fmt="netcdf", base_dir=Path(output).parent)
         p = writer.write_grid(layer, output)
@@ -308,12 +350,14 @@ def raster_terrain(ctx, path, voi, output):
 @cli.command("notify")
 @click.option("--title", "-t", required=True)
 @click.option("--body", "-b", required=True)
-@click.option("--severity", "-s", type=click.Choice(
-    ["info", "warning", "critical"]), default="info")
+@click.option(
+    "--severity", "-s", type=click.Choice(["info", "warning", "critical"]), default="info"
+)
 @click.pass_context
 def notify_cmd(ctx, title, body, severity):
     """Send a test notification through configured channels."""
     from barograph.notifications import NotificationManager, NotificationMessage
+
     cfg = settings(ctx).notifications
     manager = NotificationManager(
         channels=cfg.channels,
@@ -323,8 +367,7 @@ def notify_cmd(ctx, title, body, severity):
         timeout_seconds=cfg.timeout_seconds,
         file_path=cfg.file_path or None,
     )
-    results = manager.notify(NotificationMessage(title=title, body=body,
-                                                 severity=severity))
+    results = manager.notify(NotificationMessage(title=title, body=body, severity=severity))
     for r in results:
         status = "OK" if r.delivered else f"FAILED ({r.error})"
         click.echo(f"  [{r.channel}] {status} (attempts={r.attempts})")
@@ -332,10 +375,20 @@ def notify_cmd(ctx, title, body, severity):
 
 
 @cli.command("export")
-@click.option("--field", "-f", "path", type=click.Path(exists=True),
-              help="Path to a NetCDF grid field to export.")
-@click.option("--format", "-fmt", "fmt", type=click.Choice(
-    ["json", "csv", "netcdf", "zarr", "npy", "png"]), default="json")
+@click.option(
+    "--field",
+    "-f",
+    "path",
+    type=click.Path(exists=True),
+    help="Path to a NetCDF grid field to export.",
+)
+@click.option(
+    "--format",
+    "-fmt",
+    "fmt",
+    type=click.Choice(["json", "csv", "netcdf", "zarr", "npy", "png"]),
+    default="json",
+)
 @click.option("--output", "-o", type=click.Path(), default=None)
 @click.pass_context
 def export_cmd(ctx, path, fmt, output):
@@ -343,6 +396,7 @@ def export_cmd(ctx, path, fmt, output):
     if fmt == "png":
         from barograph.output.plots import FieldPlotter
         from barograph.utils.storage import load_gridded_field
+
         field = load_gridded_field(path) if path else ctx.obj.get("last_field")
         if field is None:
             click.echo("No field available.")
@@ -354,6 +408,7 @@ def export_cmd(ctx, path, fmt, output):
 
     from barograph.output.serializers import OutputWriter
     from barograph.utils.storage import load_gridded_field
+
     field = load_gridded_field(path) if path else ctx.obj.get("last_field")
     if field is None:
         click.echo("No field available.")
@@ -368,22 +423,25 @@ def export_cmd(ctx, path, fmt, output):
 def config_show(ctx):
     """Print the active configuration as YAML."""
     import yaml
+
     cfg = _config_to_dict(settings(ctx))
     click.echo(yaml.safe_dump(cfg, sort_keys=False))
 
 
 def _config_to_dict(settings) -> dict:
     from dataclasses import asdict
+
     return asdict(settings)
 
 
 @cli.command("climate")
-@click.option("--lats", "-la", type=click.FloatRange(-90, 90), required=True,
-              help="Latitude of the point.")
-@click.option("--lons", "-lo", type=click.FloatRange(-180, 180), required=True,
-              help="Longitude of the point.")
-@click.option("--days", "-d", type=int, default=10,
-              help="Number of forecast days to fetch.")
+@click.option(
+    "--lats", "-la", type=click.FloatRange(-90, 90), required=True, help="Latitude of the point."
+)
+@click.option(
+    "--lons", "-lo", type=click.FloatRange(-180, 180), required=True, help="Longitude of the point."
+)
+@click.option("--days", "-d", type=int, default=10, help="Number of forecast days to fetch.")
 def climate_cmd(lats, lons, days):
     """Fetch and summarize daily weather for a point (Open-Meteo)."""
     from barograph.api import OpenMeteo
@@ -405,10 +463,10 @@ def climate_cmd(lats, lons, days):
 
 
 @cli.command("risk")
-@click.option("--file", "-f", "path", type=click.Path(exists=True),
-              help="NetCDF raster field to evaluate.")
-@click.option("--kind", "-k", type=click.Choice(["hail", "wind", "flood"]),
-              required=True)
+@click.option(
+    "--file", "-f", "path", type=click.Path(exists=True), help="NetCDF raster field to evaluate."
+)
+@click.option("--kind", "-k", type=click.Choice(["hail", "wind", "flood"]), required=True)
 @click.pass_context
 def risk_cmd(ctx, path, kind):
     """Compute a hazard index from a raster field."""
@@ -423,8 +481,9 @@ def risk_cmd(ctx, path, kind):
         score = WindRiskIndex().compute(band)
         label = "wind risk (0..1)"
     else:
-        score = flood_risk_score(rainfall=band, antecedent=band * 2,
-                                 soil_moisture=np.full(band.shape, 0.5))
+        score = flood_risk_score(
+            rainfall=band, antecedent=band * 2, soil_moisture=np.full(band.shape, 0.5)
+        )
         label = "flood risk (0..1)"
     _echo_title(f"{label} of {layer.name}")
     click.echo(f"  mean={np.nanmean(score):.3f}  max={np.nanmax(score):.3f}")
@@ -432,11 +491,15 @@ def risk_cmd(ctx, path, kind):
 
 
 @cli.command("model-train")
-@click.option("--data", "-d", type=click.Path(exists=True), required=True,
-              help="CSV with feature columns and a 'target' column.")
+@click.option(
+    "--data",
+    "-d",
+    type=click.Path(exists=True),
+    required=True,
+    help="CSV with feature columns and a 'target' column.",
+)
 @click.option("--target", "-t", default="target")
-@click.option("--kind", "-k", type=click.Choice(
-    ["linear", "ridge", "forest"]), default="ridge")
+@click.option("--kind", "-k", type=click.Choice(["linear", "ridge", "forest"]), default="ridge")
 @click.option("--output", "-o", type=click.Path(), default="model.pkl")
 def model_train(data, target, kind, output):
     """Train a regression model on a CSV and persist it."""
@@ -457,8 +520,13 @@ def model_train(data, target, kind, output):
 
 
 @cli.command("qc")
-@click.option("--file", "-f", type=click.Path(exists=True), required=True,
-              help="CSV with 'time' (ISO-8601) and 'value' columns.")
+@click.option(
+    "--file",
+    "-f",
+    type=click.Path(exists=True),
+    required=True,
+    help="CSV with 'time' (ISO-8601) and 'value' columns.",
+)
 @click.option("--min-value", type=float, default=None)
 @click.option("--max-value", type=float, default=None)
 @click.option("--spike-sigma", type=float, default=5.0)
@@ -493,6 +561,7 @@ def qc_cmd(file, min_value, max_value, spike_sigma, persistence):
         click.echo(f"  {name}: {count}")
 
     from barograph.quality import detect_gaps
+
     gaps = detect_gaps(times)
     if gaps:
         click.echo(f"  detected_gaps: {len(gaps)}")
@@ -505,10 +574,10 @@ def derived():
 
 @derived.command("thermal")
 @click.option("--temperature", "-t", type=float, required=True)
-@click.option("--rh", type=click.FloatRange(0, 100), required=True,
-              help="Relative humidity in percent.")
-@click.option("--wind", "-w", type=float, default=0.0,
-              help="Wind speed in m/s.")
+@click.option(
+    "--rh", type=click.FloatRange(0, 100), required=True, help="Relative humidity in percent."
+)
+@click.option("--wind", "-w", type=float, default=0.0, help="Wind speed in m/s.")
 def derived_thermal(temperature, rh, wind):
     """Compute dewpoint and thermal comfort indices."""
     from barograph.derived import (
@@ -518,6 +587,7 @@ def derived_thermal(temperature, rh, wind):
         relative_humidity,
         wind_chill,
     )
+
     td = dewpoint(temperature, rh)
     _echo_title(f"Derived quantities at T={temperature} C, RH={rh}%")
     click.echo(f"  dewpoint: {td:.2f} C")
@@ -528,8 +598,13 @@ def derived_thermal(temperature, rh, wind):
 
 
 @derived.command("precip")
-@click.option("--series", "-s", type=click.Path(exists=True), required=True,
-              help="CSV with 'time' and 'value' (mm) columns.")
+@click.option(
+    "--series",
+    "-s",
+    type=click.Path(exists=True),
+    required=True,
+    help="CSV with 'time' and 'value' (mm) columns.",
+)
 def derived_precip(series):
     """Summarize a precipitation series: totals, wet days, maxima."""
     import csv
@@ -562,17 +637,42 @@ def derived_precip(series):
 
 
 @cli.command("extreme")
-@click.option("--file", "-f", type=click.Path(exists=True), required=True,
-              help="CSV with a 'value' column of observations/excesses.")
-@click.option("--period", "-p", type=int, multiple=True, default=(10, 50, 100),
-              help="Return periods (blocks) to report.")
-@click.option("--block-size", "-b", type=int, default=None,
-              help="Group raw series into blocks of this many samples first "
-                   "(GEV block-maxima method).")
-@click.option("--method", "-m", type=click.Choice(["gev", "pot"]), default="gev",
-              help="Estimation method: block-maxima GEV or peak-over-threshold.")
-@click.option("--threshold", "-t", type=float, default=None,
-              help="Threshold for the peak-over-threshold method.")
+@click.option(
+    "--file",
+    "-f",
+    type=click.Path(exists=True),
+    required=True,
+    help="CSV with a 'value' column of observations/excesses.",
+)
+@click.option(
+    "--period",
+    "-p",
+    type=int,
+    multiple=True,
+    default=(10, 50, 100),
+    help="Return periods (blocks) to report.",
+)
+@click.option(
+    "--block-size",
+    "-b",
+    type=int,
+    default=None,
+    help="Group raw series into blocks of this many samples first (GEV block-maxima method).",
+)
+@click.option(
+    "--method",
+    "-m",
+    type=click.Choice(["gev", "pot"]),
+    default="gev",
+    help="Estimation method: block-maxima GEV or peak-over-threshold.",
+)
+@click.option(
+    "--threshold",
+    "-t",
+    type=float,
+    default=None,
+    help="Threshold for the peak-over-threshold method.",
+)
 def extreme_cmd(file, period, block_size, method, threshold):
     """Fit an extreme-value distribution and report extreme return levels."""
     import csv
@@ -595,8 +695,9 @@ def extreme_cmd(file, period, block_size, method, threshold):
         click.echo(f"  threshold: {thr:.3f}")
         click.echo(f"  n_exceedances: {result.n_exceedances}")
         click.echo(f"  exceedance_fraction: {result.exceedance_fraction:.4f}")
-        click.echo(f"  gpd scale={result.distribution.scale:.3f}  "
-                   f"shape={result.distribution.shape:.3f}")
+        click.echo(
+            f"  gpd scale={result.distribution.scale:.3f}  shape={result.distribution.shape:.3f}"
+        )
         click.echo("  return levels:")
         for p, lv in zip(period, levels):
             click.echo(f"    {int(p)}-block: {lv:.3f}")
@@ -619,12 +720,17 @@ def extreme_cmd(file, period, block_size, method, threshold):
 
 
 @cli.command("spi")
-@click.option("--file", "-f", type=click.Path(exists=True), required=True,
-              help="CSV with a 'value' column of precipitation (mm).")
-@click.option("--window", "-w", type=int, default=3,
-              help="Accumulation window size (periods).")
-@click.option("--current", "-c", is_flag=True,
-              help="Also print the index of the most recent accumulation.")
+@click.option(
+    "--file",
+    "-f",
+    type=click.Path(exists=True),
+    required=True,
+    help="CSV with a 'value' column of precipitation (mm).",
+)
+@click.option("--window", "-w", type=int, default=3, help="Accumulation window size (periods).")
+@click.option(
+    "--current", "-c", is_flag=True, help="Also print the index of the most recent accumulation."
+)
 def spi_cmd(file, window, current):
     """Compute the Standardized Precipitation Index from a precipitation CSV."""
     import csv
@@ -643,20 +749,29 @@ def spi_cmd(file, window, current):
     click.echo(f"  min: {np.nanmin(series):.2f}  max: {np.nanmax(series):.2f}")
     click.echo(f"  mean: {np.nanmean(series):.2f}  n_valid: {valid.size}")
     if current and np.isfinite(series[-1]):
-        click.echo(f"  current_spi: {series[-1]:.2f} "
-                   f"({classify_drought(float(series[-1]))})")
+        click.echo(f"  current_spi: {series[-1]:.2f} ({classify_drought(float(series[-1]))})")
 
 
 @cli.command("spei")
-@click.option("--precip-file", "-p", type=click.Path(exists=True), required=True,
-              help="CSV with a 'precip' column of precipitation (mm).")
-@click.option("--temp-file", "-t", type=click.Path(exists=True), required=True,
-              help="CSV with a 'temp' column of mean temperature (Celsius).")
+@click.option(
+    "--precip-file",
+    "-p",
+    type=click.Path(exists=True),
+    required=True,
+    help="CSV with a 'precip' column of precipitation (mm).",
+)
+@click.option(
+    "--temp-file",
+    "-t",
+    type=click.Path(exists=True),
+    required=True,
+    help="CSV with a 'temp' column of mean temperature (Celsius).",
+)
 @click.option("--latitude", "-la", type=click.FloatRange(-90, 90), required=True)
-@click.option("--window", "-w", type=int, default=3,
-              help="Accumulation window size (periods).")
-@click.option("--current", "-c", is_flag=True,
-              help="Also print the index of the most recent accumulation.")
+@click.option("--window", "-w", type=int, default=3, help="Accumulation window size (periods).")
+@click.option(
+    "--current", "-c", is_flag=True, help="Also print the index of the most recent accumulation."
+)
 def spei_cmd(precip_file, temp_file, latitude, window, current):
     """Compute the Standardized Precipitation-Evapotranspiration Index."""
     import csv
@@ -678,8 +793,7 @@ def spei_cmd(precip_file, temp_file, latitude, window, current):
     click.echo(f"  min: {np.nanmin(series):.2f}  max: {np.nanmax(series):.2f}")
     click.echo(f"  mean: {np.nanmean(series):.2f}")
     if current and np.isfinite(series[-1]):
-        click.echo(f"  current_spei: {series[-1]:.2f} "
-                   f"({classify_drought(float(series[-1]))})")
+        click.echo(f"  current_spei: {series[-1]:.2f} ({classify_drought(float(series[-1]))})")
 
 
 def _load_raster(path: str):
@@ -687,6 +801,7 @@ def _load_raster(path: str):
     import xarray as xr
 
     from barograph.raster.layer import CRS, RasterLayer
+
     ds = xr.open_dataset(path)
     # pick the first non-coordinate data variable
     var_name = None
