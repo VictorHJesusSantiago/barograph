@@ -52,10 +52,7 @@ def resample_temporal(
 
     total_hours = (src_times[-1] - src_times[0]).total_seconds() / 3600
     n_steps = int(total_hours / target_step_hours) + 1
-    target_times = [
-        src_times[0] + timedelta(hours=i * target_step_hours)
-        for i in range(n_steps)
-    ]
+    target_times = [src_times[0] + timedelta(hours=i * target_step_hours) for i in range(n_steps)]
 
     result_shape = (len(target_times),) + data.shape[1:]
     result = np.zeros(result_shape, dtype=np.float64)

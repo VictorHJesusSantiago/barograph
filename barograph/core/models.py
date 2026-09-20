@@ -59,6 +59,7 @@ class TimeRange:
     @property
     def steps(self) -> list[datetime]:
         from datetime import timedelta
+
         current = self.start
         result = []
         while current <= self.end:
@@ -70,6 +71,7 @@ class TimeRange:
 @dataclass
 class GriddedField:
     """A 2D or 3D gridded meteorological field."""
+
     data: np.ndarray
     lats: np.ndarray
     lons: np.ndarray
@@ -94,6 +96,7 @@ class GriddedField:
 @dataclass
 class EnsembleForecast:
     """Ensemble forecast with multiple members."""
+
     members: list[GriddedField]
     variable: Variable
     source: ModelSource
@@ -141,6 +144,7 @@ class EnsembleForecast:
 @dataclass
 class PointForecast:
     """Forecast at a single point."""
+
     coord: Coordinate | None
     variable: Variable | None
     values: list[float]
@@ -154,6 +158,7 @@ class PointForecast:
 @dataclass
 class StationObs:
     """Observation at a weather station."""
+
     station_id: str
     coord: Coordinate
     variable: Variable
@@ -165,6 +170,7 @@ class StationObs:
 @dataclass
 class RadarSweep:
     """Single radar sweep / composite."""
+
     data: np.ndarray
     lats: np.ndarray
     lons: np.ndarray
@@ -188,6 +194,7 @@ class RadarSweep:
 @dataclass
 class ThresholdAlert:
     """Alert triggered by threshold exceedance."""
+
     variable: Variable
     threshold: float
     operator: str  # "gt", "lt", "ge", "le"
@@ -203,6 +210,7 @@ class ThresholdAlert:
 @dataclass
 class VerificationReport:
     """Results from forecast verification."""
+
     metric_name: str
     value: float
     variable: Variable
