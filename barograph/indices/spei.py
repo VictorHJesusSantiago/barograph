@@ -126,11 +126,11 @@ def compute_spei(
     cum = np.concatenate([[0.0], np.cumsum(balance)])
     rolling = cum[window:] - cum[:-window]
     if np.nanstd(rolling) < 1e-9:
-        out[window - 1:] = 0.0
+        out[window - 1 :] = 0.0
         return out
     alpha, beta = _logistic_fit(rolling)
     if not np.isfinite(alpha) or not np.isfinite(beta):
-        out[window - 1:] = 0.0
+        out[window - 1 :] = 0.0
         return out
     for i in range(window - 1, n):
         acc = rolling[i - window + 1]

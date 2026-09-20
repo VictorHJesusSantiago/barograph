@@ -126,14 +126,30 @@ def _approx_gammaln(z: float) -> float:
 def _norm_ppf(p: np.ndarray) -> np.ndarray:
     """Quantile function of the standard normal (Acklam approximation)."""
     p = np.asarray(p, dtype=np.float64)
-    a = [-3.969683028665376e01, 2.209460984245205e02, -2.759285104469687e02,
-         1.383577518672690e02, -3.066479806614716e01, 2.506628277459239e00]
-    b = [-5.447609879822406e01, 1.615858368580409e02, -1.556989798598866e02,
-         6.680131188771972e01, -1.328068155288572e01]
-    c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e00,
-         -2.549732539343734e00, 4.374664141464968e00, 2.938163982698783e00]
-    d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e00,
-         3.754408661907416e00]
+    a = [
+        -3.969683028665376e01,
+        2.209460984245205e02,
+        -2.759285104469687e02,
+        1.383577518672690e02,
+        -3.066479806614716e01,
+        2.506628277459239e00,
+    ]
+    b = [
+        -5.447609879822406e01,
+        1.615858368580409e02,
+        -1.556989798598866e02,
+        6.680131188771972e01,
+        -1.328068155288572e01,
+    ]
+    c = [
+        -7.784894002430293e-03,
+        -3.223964580411365e-01,
+        -2.400758277161838e00,
+        -2.549732539343734e00,
+        4.374664141464968e00,
+        2.938163982698783e00,
+    ]
+    d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e00, 3.754408661907416e00]
     plow = 0.02425
     phigh = 1 - plow
     out = np.empty_like(p)
@@ -143,22 +159,25 @@ def _norm_ppf(p: np.ndarray) -> np.ndarray:
     pm = p[mid]
     q = pm - 0.5
     r = q * q
-    out[mid] = (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (
-        ((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1.0)
+    out[mid] = (
+        (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5])
+        * q
+        / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1.0)
+    )
     pl = p[lo]
     rl = np.sqrt(-2.0 * np.log(pl))
     out[lo] = (((((c[0] * rl + c[1]) * rl + c[2]) * rl + c[3]) * rl + c[4]) * rl + c[5]) / (
-        (((d[0] * rl + d[1]) * rl + d[2]) * rl + d[3]) * rl + 1.0)
+        (((d[0] * rl + d[1]) * rl + d[2]) * rl + d[3]) * rl + 1.0
+    )
     ph = p[hi]
     rh = np.sqrt(-2.0 * np.log(1.0 - ph))
     out[hi] = -(((((c[0] * rh + c[1]) * rh + c[2]) * rh + c[3]) * rh + c[4]) * rh + c[5]) / (
-        (((d[0] * rh + d[1]) * rh + d[2]) * rh + d[3]) * rh + 1.0)
+        (((d[0] * rh + d[1]) * rh + d[2]) * rh + d[3]) * rh + 1.0
+    )
     return out
 
 
-def compute_spi(
-    precip_window: np.ndarray, accumulation_label: str | None = None
-) -> np.ndarray:
+def compute_spi(precip_window: np.ndarray, accumulation_label: str | None = None) -> np.ndarray:
     """Compute the SPI for each precipitation accumulation in a window.
 
     A Gamma distribution is fitted to the positive accumulations of *precip_window*
@@ -185,9 +204,7 @@ def compute_spi(
     return _norm_ppf(np.clip(total_prob, 1e-12, 1.0 - 1e-12))
 
 
-def compute_spi_series(
-    precip: np.ndarray, window: int
-) -> np.ndarray:
+def compute_spi_series(precip: np.ndarray, window: int) -> np.ndarray:
     """Compute a rolling SPI series over a moving accumulation window.
 
     Args:
@@ -209,13 +226,13 @@ def compute_spi_series(
     rolling = cum[window:] - cum[:-window]
     # a window with no variability has no deviation from climatology
     if np.nanstd(rolling) < 1e-9:
-        out[window - 1:] = 0.0
+        out[window - 1 :] = 0.0
         return out
     # fit the Gamma to all positive window accumulations once
     try:
         alpha, beta = _fit_gamma_alpha_beta(rolling)
     except ValueError:
-        out[window - 1:] = 0.0
+        out[window - 1 :] = 0.0
         return out
     zero_frac = float(np.mean(rolling == 0.0))
     for i in range(window - 1, n):
