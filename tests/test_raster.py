@@ -182,8 +182,9 @@ def test_terrain_slope_and_hillshade():
 def test_terrain_stats():
     lats = np.linspace(-25.0, -20.0, 10)
     lons = np.linspace(-50.0, -45.0, 10)
-    dem = RasterLayer(data=np.full((1, 10, 10), 100.0, dtype=np.float32),
-                      lats=lats, lons=lons, name="dem")
+    dem = RasterLayer(
+        data=np.full((1, 10, 10), 100.0, dtype=np.float32), lats=lats, lons=lons, name="dem"
+    )
     stats = Terrain.elevation_stats(dem)
     assert stats["min"] == 100.0
 
