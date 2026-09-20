@@ -19,12 +19,14 @@ def make_sweeps(n_sweeps=2, size=32):
         y, x = np.mgrid[0:size, 0:size]
         data = 60.0 * np.exp(-(((x - center_x) / 4) ** 2 + ((y - 16) / 4) ** 2))
 
-        sweeps.append(RadarSweep(
-            data=data,
-            lats=np.linspace(-30, -20, size),
-            lons=np.linspace(-50, -40, size),
-            scan_time=base_time + k * timedelta(minutes=10),
-        ))
+        sweeps.append(
+            RadarSweep(
+                data=data,
+                lats=np.linspace(-30, -20, size),
+                lons=np.linspace(-50, -40, size),
+                scan_time=base_time + k * timedelta(minutes=10),
+            )
+        )
     return sweeps
 
 
@@ -46,6 +48,7 @@ def test_extrapolator_nowcast_produces_fields():
     ext = Extrapolator(nowcaster=OpticalFlowNowcaster(method="block", winsize=3))
 
     from datetime import timedelta
+
     leads = [timedelta(minutes=30)]
     out = ext.nowcast(sweeps, leads)
     assert len(out) == 1

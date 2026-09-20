@@ -9,8 +9,7 @@ from barograph.notifications.manager import (
 
 
 def make_msg():
-    return NotificationMessage(title="Test", body="Hello", severity="info",
-                               tags={"a": 1})
+    return NotificationMessage(title="Test", body="Hello", severity="info", tags={"a": 1})
 
 
 def test_console_and_file_channels(tmp_path):
@@ -32,7 +31,8 @@ def test_webhook_success_with_injected_transport():
         return True
 
     manager = NotificationManager(
-        channels=["webhook"], webhook_url="http://example.invalid/hook",
+        channels=["webhook"],
+        webhook_url="http://example.invalid/hook",
         http_transport=transport,
     )
     results = manager.notify(make_msg())
@@ -49,8 +49,11 @@ def test_webhook_retries_then_fails():
         raise RuntimeError("boom")
 
     manager = NotificationManager(
-        channels=["webhook"], webhook_url="http://example.invalid/hook",
-        max_retries=2, backoff_base=0.0, http_transport=transport,
+        channels=["webhook"],
+        webhook_url="http://example.invalid/hook",
+        max_retries=2,
+        backoff_base=0.0,
+        http_transport=transport,
     )
     results = manager.notify(make_msg())
     assert not results[0].delivered
@@ -66,7 +69,8 @@ def test_slack_payload_format():
         return True
 
     manager = NotificationManager(
-        channels=["slack"], webhook_url="http://example.invalid/slack",
+        channels=["slack"],
+        webhook_url="http://example.invalid/slack",
         http_transport=transport,
     )
     manager.notify(make_msg())
@@ -82,7 +86,8 @@ def test_discord_payload_embed():
         return True
 
     manager = NotificationManager(
-        channels=["discord"], webhook_url="http://example.invalid/discord",
+        channels=["discord"],
+        webhook_url="http://example.invalid/discord",
         http_transport=transport,
     )
     manager.notify(make_msg())
@@ -102,7 +107,8 @@ def test_history_and_metrics():
         return True
 
     manager = NotificationManager(
-        channels=["webhook"], webhook_url="http://example.invalid/hook",
+        channels=["webhook"],
+        webhook_url="http://example.invalid/hook",
         http_transport=transport,
     )
     manager.notify(make_msg())
