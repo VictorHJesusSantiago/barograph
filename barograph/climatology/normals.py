@@ -64,9 +64,7 @@ def monthly_climatology(
     months = np.array([t.month for t in times])
     arr = np.asarray(values, dtype=np.float64)
     if years is not None:
-        keep = np.array(
-            [years[0] <= t.year <= years[1] for t in times]
-        )
+        keep = np.array([years[0] <= t.year <= years[1] for t in times])
         months = months[keep]
         arr = arr[keep]
     result: dict[int, tuple[float, float]] = {}
@@ -94,8 +92,6 @@ def annual_climatology(
     return (float(np.mean(arr)), float(np.std(arr)))
 
 
-def deviation_from_normal(
-    normal: ClimatologyNormal, value: float, month: int
-) -> float:
+def deviation_from_normal(normal: ClimatologyNormal, value: float, month: int) -> float:
     """Raw deviation of *value* from the stored *normal* for a month."""
     return normal.deviation(value, month)

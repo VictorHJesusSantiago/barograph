@@ -26,6 +26,7 @@ class Severity(Enum):
 @dataclass
 class AlertRule:
     """A threshold-based alert rule."""
+
     variable: Variable
     threshold: float
     operator: Operator = Operator.GREATER_OR_EQUAL
