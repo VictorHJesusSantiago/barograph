@@ -46,9 +46,7 @@ class VerificationDashboard:
                 counts[label][metric] += 1
         out: dict[str, dict[str, float]] = {}
         for label, metric_map in sums.items():
-            out[label] = {
-                m: sums[label][m] / counts[label][m] for m in metric_map
-            }
+            out[label] = {m: sums[label][m] / counts[label][m] for m in metric_map}
         return out
 
     def to_dict(self) -> dict[str, Any]:
@@ -75,8 +73,7 @@ class VerificationDashboard:
         for label in combined:
             metrics = combined[label]
             cells = "".join(
-                f"<td>{html.escape(label)}</td>"
-                f"<td>{html.escape(m)}</td><td>{v:.4f}</td>"
+                f"<td>{html.escape(label)}</td><td>{html.escape(m)}</td><td>{v:.4f}</td>"
                 for m, v in metrics.items()
             )
             if not metrics:
@@ -117,10 +114,10 @@ class VerificationDashboard:
 <h2>Aggregate metrics</h2>
 <table>
 <tr><th>Case</th><th>Metric</th><th>Value</th></tr>
-{''.join(rows) if rows else '<tr><td colspan="3">No metrics recorded.</td></tr>'}
+{"".join(rows) if rows else '<tr><td colspan="3">No metrics recorded.</td></tr>'}
 </table>
 <h2>Time series</h2>
-{series_html if series_html else '<p>No series recorded.</p>'}
+{series_html if series_html else "<p>No series recorded.</p>"}
 <footer><p>Barograph verification dashboard ({len(combined)} case(s)).</p></footer>
 </body>
 </html>"""

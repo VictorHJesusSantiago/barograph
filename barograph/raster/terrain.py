@@ -64,9 +64,8 @@ class Terrain:
         slp_rad = np.radians(slope)
         asp_rad = np.radians(aspect)
 
-        shaded = (
-            np.sin(alt_rad) * np.cos(slp_rad)
-            + np.cos(alt_rad) * np.sin(slp_rad) * np.cos(az_rad - asp_rad)
+        shaded = np.sin(alt_rad) * np.cos(slp_rad) + np.cos(alt_rad) * np.sin(slp_rad) * np.cos(
+            az_rad - asp_rad
         )
         shaded = np.clip(shaded, 0, 1)
         return shaded * 255.0
