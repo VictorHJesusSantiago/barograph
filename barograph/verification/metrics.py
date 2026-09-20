@@ -66,6 +66,7 @@ class VerificationMetrics:
     @staticmethod
     def reliability(prob: np.ndarray, obs: np.ndarray, n_bins: int = 10) -> float:
         from barograph.verification.brier import brier_decomposition
+
         return brier_decomposition(prob, obs, n_bins)["reliability"]
 
     def compute_all(
@@ -85,6 +86,7 @@ class VerificationMetrics:
         if prob is not None and len(prob) == len(obs) and np.all((obs == 0) | (obs == 1)):
             results["brier"] = float(np.mean(brier_score(prob, obs)))
             from barograph.verification.brier import brier_decomposition
+
             results.update(brier_decomposition(prob, obs))
 
         if ensemble is not None:

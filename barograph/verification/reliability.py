@@ -85,4 +85,5 @@ def accuracy_curve(prob: np.ndarray, obs: np.ndarray, n_bins: int = 10):
 def _brier_components(prob: np.ndarray, obs: np.ndarray, n_bins: int) -> dict[str, float]:
     """Internal helper computing Brier decomposition components."""
     from barograph.verification.brier import brier_decomposition
+
     return brier_decomposition(prob, obs, n_bins)
