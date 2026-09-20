@@ -25,7 +25,10 @@ class RouteTable:
 
     def __init__(self) -> None:
         self._routes: dict[str, list[tuple[Any, Handler]]] = {
-            "GET": [], "POST": [], "PUT": [], "DELETE": []
+            "GET": [],
+            "POST": [],
+            "PUT": [],
+            "DELETE": [],
         }
 
     def register(self, method: str, path: str, handler: Handler) -> None:
@@ -90,9 +93,7 @@ class BarographHTTPServer:
                         body = json.loads(raw.decode("utf-8"))
                     except (ValueError, UnicodeDecodeError):
                         body = {"error": "invalid_json"}
-                status, payload = server.handle_request(
-                    self.command, parsed.path, body
-                )
+                status, payload = server.handle_request(self.command, parsed.path, body)
                 data = json.dumps(payload).encode("utf-8")
                 self.send_response(status)
                 self.send_header("Content-Type", "application/json")

@@ -51,9 +51,7 @@ class Scheduler:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
 
-    def add(
-        self, name: str, func: JobFunc, interval_seconds: float
-    ) -> ScheduledJob:
+    def add(self, name: str, func: JobFunc, interval_seconds: float) -> ScheduledJob:
         """Register a periodic job."""
         job = ScheduledJob(
             name=name,
@@ -95,6 +93,4 @@ class Scheduler:
     @property
     def stats(self) -> dict[str, int]:
         """Per-job run/failure counts."""
-        return {
-            job.name: job.runs for job in self.jobs
-        }
+        return {job.name: job.runs for job in self.jobs}
