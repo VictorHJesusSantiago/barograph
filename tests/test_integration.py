@@ -54,11 +54,17 @@ def sample_ensemble():
     fields = []
     for m in range(5):
         data = rng.normal(25.0 + m * 0.5, 2.0, (10, 10)).astype(np.float32)
-        fields.append(GriddedField(
-            data=data, lats=lats, lons=lons,
-            variable=Variable.TEMPERATURE, source=ModelSource.GFS,
-            valid_time=t, init_time=t,
-        ))
+        fields.append(
+            GriddedField(
+                data=data,
+                lats=lats,
+                lons=lons,
+                variable=Variable.TEMPERATURE,
+                source=ModelSource.GFS,
+                valid_time=t,
+                init_time=t,
+            )
+        )
 
     return EnsembleForecast(
         members=fields,
@@ -81,12 +87,14 @@ def test_full_ingest_to_alert_workflow(sample_field):
     assert 0 <= j < field.shape[1]
 
     engine = AlertEngine(notification_channels=[])
-    engine.add_rule(AlertRule(
-        variable=Variable.TEMPERATURE,
-        threshold=30.0,
-        operator=Operator.GREATER_OR_EQUAL,
-        severity=Severity.WARNING,
-    ))
+    engine.add_rule(
+        AlertRule(
+            variable=Variable.TEMPERATURE,
+            threshold=30.0,
+            operator=Operator.GREATER_OR_EQUAL,
+            severity=Severity.WARNING,
+        )
+    )
     alerts = engine.evaluate_field(field)
     assert isinstance(alerts, list)
 
@@ -222,7 +230,10 @@ def test_clip_to_bbox():
     data = np.random.default_rng(42).normal(0, 1, (20, 20))
 
     clipped_lats, clipped_lons, clipped_data = clip_to_bbox(
-        lats, lons, data, (-23.0, -21.0, -48.0, -46.0),
+        lats,
+        lons,
+        data,
+        (-23.0, -21.0, -48.0, -46.0),
     )
     assert len(clipped_lats) < 20
     assert len(clipped_lons) < 20
@@ -239,19 +250,24 @@ def test_grid_creation():
 
 def test_alert_cooldown():
     engine = AlertEngine(cooldown_minutes=60, notification_channels=[])
-    engine.add_rule(AlertRule(
-        variable=Variable.TEMPERATURE,
-        threshold=20.0,
-        operator=Operator.GREATER_OR_EQUAL,
-        severity=Severity.WARNING,
-    ))
+    engine.add_rule(
+        AlertRule(
+            variable=Variable.TEMPERATURE,
+            threshold=20.0,
+            operator=Operator.GREATER_OR_EQUAL,
+            severity=Severity.WARNING,
+        )
+    )
 
     lats = np.linspace(-25.0, -20.0, 5)
     lons = np.linspace(-50.0, -45.0, 5)
     data = np.full((5, 5), 25.0)
     field = GriddedField(
-        data=data, lats=lats, lons=lons,
-        variable=Variable.TEMPERATURE, source=ModelSource.GFS,
+        data=data,
+        lats=lats,
+        lons=lons,
+        variable=Variable.TEMPERATURE,
+        source=ModelSource.GFS,
         valid_time=datetime(2026, 1, 1, 12),
         init_time=datetime(2026, 1, 1, 0),
     )

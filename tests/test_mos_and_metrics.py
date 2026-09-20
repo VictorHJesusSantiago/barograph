@@ -15,7 +15,10 @@ def make_field(variable: Variable, size=8, base=25.0, seed=0, hour=12):
     lons = np.linspace(-50, -45, size)
     data = base + rng.standard_normal((size, size))
     return GriddedField(
-        data=data, lats=lats, lons=lons, variable=variable,
+        data=data,
+        lats=lats,
+        lons=lons,
+        variable=variable,
         source=ModelSource.GFS,
         valid_time=datetime(2026, 1, 1, hour),
         init_time=datetime(2026, 1, 1, 0),
@@ -28,8 +31,11 @@ def test_mos_trainer_builds_dataset():
     fields = [make_field(Variable.TEMPERATURE, seed=i) for i in range(n)]
     obs = [
         StationObs(
-            station_id="ST1", coord=coord, variable=Variable.TEMPERATURE,
-            values=[20.0 + i * 0.1], times=[datetime(2026, 1, 1, 12)],
+            station_id="ST1",
+            coord=coord,
+            variable=Variable.TEMPERATURE,
+            values=[20.0 + i * 0.1],
+            times=[datetime(2026, 1, 1, 12)],
         )
         for i in range(n)
     ]
@@ -50,22 +56,32 @@ def test_mos_trainer_trains_regressor():
     fields = [make_field(Variable.TEMPERATURE, seed=i) for i in range(n)]
     obs = [
         StationObs(
-            station_id="A", coord=coord, variable=Variable.TEMPERATURE,
-            values=[18.0 + i * 0.05], times=[datetime(2026, 1, 1, 12)],
+            station_id="A",
+            coord=coord,
+            variable=Variable.TEMPERATURE,
+            values=[18.0 + i * 0.05],
+            times=[datetime(2026, 1, 1, 12)],
         )
         for i in range(n)
     ]
 
     trainer = MOSTrainer(feature_radius=1)
-    reg = trainer.train(fields, obs, target_variable="temperature",
-                        algorithm="linear")
+    reg = trainer.train(fields, obs, target_variable="temperature", algorithm="linear")
 
     # Predict on a new field
     new_field = make_field(Variable.TEMPERATURE, seed=999)
-    data = trainer.build_dataset([new_field], [
-        StationObs(station_id="A", coord=coord, variable=Variable.TEMPERATURE,
-                   values=[0.0], times=[datetime(2026, 1, 1, 12)]),
-    ])
+    data = trainer.build_dataset(
+        [new_field],
+        [
+            StationObs(
+                station_id="A",
+                coord=coord,
+                variable=Variable.TEMPERATURE,
+                values=[0.0],
+                times=[datetime(2026, 1, 1, 12)],
+            ),
+        ],
+    )
     preds = reg.predict(data.X)
     assert np.all(np.isfinite(preds))
 
@@ -99,8 +115,7 @@ def test_verification_compute_all():
     bin_obs = (obs > 0.5).astype(float)
     prob = rng.random(50)
     team = VerificationMetrics()
-    results = team.compute_all(obs, fcst, prob=prob,
-                               ensemble=np.random.rand(20, 50))
+    results = team.compute_all(obs, fcst, prob=prob, ensemble=np.random.rand(20, 50))
     assert "mae" in results
     assert "rmse" in results
     assert "correlation" in results
