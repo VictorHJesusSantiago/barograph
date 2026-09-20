@@ -51,8 +51,16 @@ class ReportRenderer:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         fields = [
-            "variable", "threshold", "operator", "value", "lat", "lon",
-            "severity", "message", "trigger_time", "forecast_time",
+            "variable",
+            "threshold",
+            "operator",
+            "value",
+            "lat",
+            "lon",
+            "severity",
+            "message",
+            "trigger_time",
+            "forecast_time",
         ]
         with open(path, "w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fields)
@@ -63,8 +71,12 @@ class ReportRenderer:
 
     @staticmethod
     def alerts_to_markdown(alerts: Iterable[ThresholdAlert]) -> str:
-        lines = ["# Alerts", "", "| Severity | Variable | Value | Location | Message |",
-                 "|---|---|---|---|---|"]
+        lines = [
+            "# Alerts",
+            "",
+            "| Severity | Variable | Value | Location | Message |",
+            "|---|---|---|---|---|",
+        ]
         for a in alerts:
             lines.append(
                 f"| {a.severity} | {a.variable.value} | {a.value:.2f} | "

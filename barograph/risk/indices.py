@@ -25,11 +25,7 @@ def hail_index(
     cape = np.asarray(cape, dtype=np.float64)
     srh = np.asarray(srh, dtype=np.float64)
     shear = np.asarray(wind_shear, dtype=np.float64)
-    score = (
-        0.004 * cape
-        + 0.01 * srh
-        + 0.02 * shear
-    ) / 100.0
+    score = (0.004 * cape + 0.01 * srh + 0.02 * shear) / 100.0
     return np.clip(score, 0.0, 10.0)
 
 
@@ -69,8 +65,7 @@ def flood_risk_score(
 class HailIndex:
     """Object oriented helper for the large-hail threat index."""
 
-    def compute(self, cape: np.ndarray, srh: np.ndarray,
-                shear: np.ndarray) -> np.ndarray:
+    def compute(self, cape: np.ndarray, srh: np.ndarray, shear: np.ndarray) -> np.ndarray:
         """Return the hail index for the supplied fields."""
         return hail_index(cape, srh, shear)
 
@@ -114,9 +109,7 @@ def _as_2d(arr: np.ndarray) -> np.ndarray:
     return a
 
 
-def hail_index_field(
-    cape: GriddedField, srh: GriddedField, shear: GriddedField
-) -> GriddedField:
+def hail_index_field(cape: GriddedField, srh: GriddedField, shear: GriddedField) -> GriddedField:
     """Apply the hail index to three aligned :class:`GriddedField` inputs."""
     score = hail_index(cape.data, srh.data, shear.data)
     return GriddedField(
