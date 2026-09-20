@@ -39,10 +39,14 @@ def test_alert_rule_evaluate():
 
 
 def test_alert_engine_triggers():
-    field = make_field(np.array([
-        [10.0, 20.0, 30.0],
-        [40.0, 60.0, 90.0],
-    ]))
+    field = make_field(
+        np.array(
+            [
+                [10.0, 20.0, 30.0],
+                [40.0, 60.0, 90.0],
+            ]
+        )
+    )
 
     engine = AlertEngine(cooldown_minutes=0, notification_channels=[])
     rule = AlertRule(
@@ -56,10 +60,14 @@ def test_alert_engine_triggers():
 
 
 def test_alert_engine_no_trigger():
-    field = make_field(np.array([
-        [1.0, 2.0, 3.0],
-        [4.0, 5.0, 6.0],
-    ]))
+    field = make_field(
+        np.array(
+            [
+                [1.0, 2.0, 3.0],
+                [4.0, 5.0, 6.0],
+            ]
+        )
+    )
 
     engine = AlertEngine(notification_channels=[])
     rule = AlertRule(

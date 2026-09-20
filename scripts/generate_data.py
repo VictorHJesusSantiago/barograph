@@ -62,9 +62,10 @@ def gen_radar_sweeps(out_dir: str, n: int = 4, size: int = 64) -> None:
 
     for k in range(n):
         cx = 16 + k * 6
-        data = 60.0 * np.exp(
-            -(((x - cx) / 5) ** 2 + ((y - 24) / 5) ** 2)
-        ) + rng.standard_normal((size, size)) * 2.0
+        data = (
+            60.0 * np.exp(-(((x - cx) / 5) ** 2 + ((y - 24) / 5) ** 2))
+            + rng.standard_normal((size, size)) * 2.0
+        )
 
         ds = xr.Dataset(
             {"reflectivity": (("latitude", "longitude"), data)},
@@ -89,11 +90,13 @@ def gen_mos_pairs(out: str, n: int = 2000) -> None:
     model_precip = np.clip(rng.gamma(2.0, 2.5, n), 0, None)
     obs_temp = 0.85 * model_temp + rng.normal(1.5, 2.0, n)
 
-    df = pd.DataFrame({
-        "model_temp": model_temp,
-        "model_precip": model_precip,
-        "obs_temp": obs_temp,
-    })
+    df = pd.DataFrame(
+        {
+            "model_temp": model_temp,
+            "model_precip": model_precip,
+            "obs_temp": obs_temp,
+        }
+    )
     Path(out).parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(out, index=False)
     print(f"Wrote {n} MOS training pairs to {out}")
