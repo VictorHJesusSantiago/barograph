@@ -22,9 +22,7 @@ class RasterAlgebra:
         ref_lons = layers[0].lons
         for layer in layers[1:]:
             if layer.data.shape != ref_shape:
-                raise ValueError(
-                    f"Rasters must be aligned: {ref_shape} vs {layer.data.shape}"
-                )
+                raise ValueError(f"Rasters must be aligned: {ref_shape} vs {layer.data.shape}")
             if not np.allclose(layer.lats, ref_lats) or not np.allclose(layer.lons, ref_lons):
                 raise ValueError("Rasters must share the same lat/lon grid")
 
@@ -51,9 +49,7 @@ class RasterAlgebra:
         return RasterAlgebra._combine(a, b, result, name=f"{a.name}/{b.name}")
 
     @staticmethod
-    def _combine(
-        a: RasterLayer, b: RasterLayer, data: np.ndarray, name: str
-    ) -> RasterLayer:
+    def _combine(a: RasterLayer, b: RasterLayer, data: np.ndarray, name: str) -> RasterLayer:
         return RasterLayer(
             data=data,
             lats=a.lats,
@@ -98,8 +94,14 @@ class RasterAlgebra:
         arr = np.asarray(layer.band(band), dtype=np.float64)
         valid = arr[np.isfinite(arr)]
         if valid.size == 0:
-            return {"min": np.nan, "max": np.nan, "mean": np.nan, "std": np.nan,
-                    "p5": np.nan, "p95": np.nan}
+            return {
+                "min": np.nan,
+                "max": np.nan,
+                "mean": np.nan,
+                "std": np.nan,
+                "p5": np.nan,
+                "p95": np.nan,
+            }
         return {
             "min": float(valid.min()),
             "max": float(valid.max()),
@@ -119,8 +121,7 @@ class RasterAlgebra:
         src_rows = np.clip(src_rows, 0, layer.ny - 1)
         src_cols = np.clip(src_cols, 0, layer.nx - 1)
 
-        out = np.empty((layer.nbands, len(target_lats), len(target_lons)),
-                       dtype=np.float32)
+        out = np.empty((layer.nbands, len(target_lats), len(target_lons)), dtype=np.float32)
         for b in range(layer.nbands):
             out[b] = layer.data[b][np.ix_(src_rows, src_cols)]
         return RasterLayer(
@@ -148,14 +149,19 @@ class RasterAlgebra:
 
         if method == "nearest":
             out = griddata(
-                (lons, lats), values, (grid_lons[None, :], grid_lats[:, None]),
+                (lons, lats),
+                values,
+                (grid_lons[None, :], grid_lats[:, None]),
                 method="nearest",
             )
         elif method in ("linear", "cubic"):
             out = griddata(
-                (lons, lats), values,
-                (np.meshgrid(grid_lons, grid_lats, indexing="xy")[0],
-                 np.meshgrid(grid_lons, grid_lats, indexing="xy")[1]),
+                (lons, lats),
+                values,
+                (
+                    np.meshgrid(grid_lons, grid_lats, indexing="xy")[0],
+                    np.meshgrid(grid_lons, grid_lats, indexing="xy")[1],
+                ),
                 method=method,
             )
         else:

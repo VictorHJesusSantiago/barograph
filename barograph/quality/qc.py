@@ -37,9 +37,7 @@ class QCThresholds:
     duplicate_tol: float = 1e-12
 
 
-def check_gross_range(
-    values: np.ndarray, thresholds: QCThresholds
-) -> np.ndarray:
+def check_gross_range(values: np.ndarray, thresholds: QCThresholds) -> np.ndarray:
     """Flag samples falling outside the allowed physical range.
 
     Returns:
@@ -52,9 +50,7 @@ def check_gross_range(
     return flag
 
 
-def check_spikes(
-    values: np.ndarray, thresholds: QCThresholds
-) -> np.ndarray:
+def check_spikes(values: np.ndarray, thresholds: QCThresholds) -> np.ndarray:
     """Flag isolated spikes relative to a robust local baseline.
 
     A sample is a spike if it deviates from the median of its neighbours by
@@ -66,7 +62,7 @@ def check_spikes(
         return np.zeros(n, dtype=bool)
     flag = np.zeros(n, dtype=bool)
     for i in range(2, n - 2):
-        window = values[i - 2:i + 3]
+        window = values[i - 2 : i + 3]
         center = window[2]
         baseline = np.median(window[(np.arange(5) != 2)])  # exclude center
         mad = np.median(np.abs(window - np.median(window)))
@@ -77,9 +73,7 @@ def check_spikes(
     return flag
 
 
-def check_persistence(
-    values: np.ndarray, thresholds: QCThresholds
-) -> np.ndarray:
+def check_persistence(values: np.ndarray, thresholds: QCThresholds) -> np.ndarray:
     """Flag runs of identical values longer than ``persistence_span``."""
     values = np.asarray(values, dtype=np.float64)
     n = len(values)
@@ -95,9 +89,7 @@ def check_persistence(
     return flag
 
 
-def check_duplicates(
-    times: list[datetime], values: np.ndarray
-) -> np.ndarray:
+def check_duplicates(times: list[datetime], values: np.ndarray) -> np.ndarray:
     """Flag samples sharing an identical timestamp."""
     n = len(times)
     flag = np.zeros(n, dtype=bool)
@@ -110,9 +102,7 @@ def check_duplicates(
     return flag
 
 
-def detect_gaps(
-    times: list[datetime], max_gap_hours: float = 8.0
-) -> list[tuple[int, int]]:
+def detect_gaps(times: list[datetime], max_gap_hours: float = 8.0) -> list[tuple[int, int]]:
     """Return intervals of missing data.
 
     Returns:
