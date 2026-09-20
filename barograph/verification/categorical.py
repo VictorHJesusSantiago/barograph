@@ -33,9 +33,7 @@ class ContingencyTable:
         return self.hits + self.misses + self.false_alarms + self.correct_negatives
 
 
-def contingency_table(
-    forecast: np.ndarray, observed: np.ndarray
-) -> ContingencyTable:
+def contingency_table(forecast: np.ndarray, observed: np.ndarray) -> ContingencyTable:
     """Build a contingency table from aligned binary forecast/observed arrays."""
     f = np.asarray(forecast).astype(bool)
     o = np.asarray(observed).astype(bool)
@@ -93,9 +91,7 @@ def equitable_threat_score(table: ContingencyTable | None = None, **counts: int)
     total = t.total
     if total == 0:
         return np.nan
-    hits_random = (
-        (t.hits + t.misses) * (t.hits + t.false_alarms) / total
-    )
+    hits_random = (t.hits + t.misses) * (t.hits + t.false_alarms) / total
     denom = t.hits + t.misses + t.false_alarms - hits_random
     if denom == 0:
         return np.nan

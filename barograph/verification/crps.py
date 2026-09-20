@@ -13,11 +13,7 @@ def crps_normal(loc: np.ndarray, scale: np.ndarray, obs: np.ndarray) -> np.ndarr
     obs = np.asarray(obs, dtype=np.float64)
 
     z = (obs - loc) / scale
-    crps = scale * (
-        z * (2 * stats.norm.cdf(z) - 1)
-        + 2 * stats.norm.pdf(z)
-        - 1 / np.sqrt(np.pi)
-    )
+    crps = scale * (z * (2 * stats.norm.cdf(z) - 1) + 2 * stats.norm.pdf(z) - 1 / np.sqrt(np.pi))
     return crps
 
 
