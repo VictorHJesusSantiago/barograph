@@ -46,6 +46,7 @@ def test_ttl_cache_expired_get(tmp_path, monkeypatch):
     data_path = cache._key_path("a")
     old_mtime = data_path.stat().st_mtime - 3600 * 8  # 8h ago
     import os
+
     os.utime(data_path, (old_mtime, old_mtime))
     assert cache.get("a") is None
 
@@ -68,6 +69,7 @@ def test_memoize_decorator(tmp_path, monkeypatch):
 # ---------- MOS evaluation ----------
 def test_skill_vs_reference_perfect():
     from barograph.mos.evaluation import skill_vs_reference
+
     obs = np.array([1.0, 2.0, 3.0, 4.0])
     preds = obs.copy()
     reference = np.full(4, 2.5)
@@ -78,6 +80,7 @@ def test_skill_vs_reference_perfect():
 
 def test_skill_vs_reference_worse_than_ref():
     from barograph.mos.evaluation import skill_vs_reference
+
     obs = np.array([1.0, 2.0, 3.0, 4.0])
     preds = np.array([9.0, 9.0, 9.0, 9.0])
     reference = np.array([2.0, 2.0, 3.0, 4.0])
@@ -87,6 +90,7 @@ def test_skill_vs_reference_worse_than_ref():
 
 def test_mse_reduction():
     from barograph.mos.evaluation import mse_reduction
+
     obs = np.array([1.0, 2.0, 3.0, 4.0])
     preds = obs.copy()
     reference = np.full(4, 2.5)
@@ -95,6 +99,7 @@ def test_mse_reduction():
 
 def test_cross_validate_mos_linear(tmp_path):
     from barograph.mos.evaluation import cross_validate_mos
+
     rng = np.random.default_rng(0)
     X = rng.normal(size=(80, 5))
     y = X @ np.array([1.0, -2.0, 0.5, 3.0, -1.0]) + rng.normal(0, 0.1, 80)
@@ -107,6 +112,7 @@ def test_cross_validate_mos_linear(tmp_path):
 # ---------- Logging ----------
 def test_setup_logging():
     from barograph.utils.logging import get_logger, setup_logging
+
     setup_logging(level="DEBUG")
     logger = get_logger("barograph.test")
     assert logger is not None

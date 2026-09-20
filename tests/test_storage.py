@@ -40,6 +40,7 @@ def test_to_zarr(tmp_path):
     assert path.exists()
 
     import xarray as xr
+
     ds = xr.open_zarr(path)
     assert "data" in ds.data_vars
     assert ds.sizes["time"] == 2

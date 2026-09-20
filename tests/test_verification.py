@@ -37,11 +37,13 @@ def test_brier_decomp():
 
 
 def test_crps_ensemble():
-    members = np.array([
-        [1.0, 2.0, 3.0, 4.0, 5.0],
-        [1.0, 2.0, 3.0, 4.0, 5.0],
-        [1.0, 2.0, 3.0, 4.0, 5.0],
-    ])
+    members = np.array(
+        [
+            [1.0, 2.0, 3.0, 4.0, 5.0],
+            [1.0, 2.0, 3.0, 4.0, 5.0],
+            [1.0, 2.0, 3.0, 4.0, 5.0],
+        ]
+    )
     obs = np.array([2.0, 3.0, 4.0, 5.0, 6.0])
     score = crps_ensemble(members, obs)
     assert np.all(np.isfinite(score))
