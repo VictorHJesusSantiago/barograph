@@ -10,17 +10,13 @@ import numpy as np
 _EARTH_RADIUS_KM = 6371.0
 
 
-def haversine_distance(
-    lon1: float, lat1: float, lon2: float, lat2: float
-) -> float:
+def haversine_distance(lon1: float, lat1: float, lon2: float, lat2: float) -> float:
     """Great-circle distance in kilometres between two lon/lat points."""
     phi1 = math.radians(lat1)
     phi2 = math.radians(lat2)
     dphi = math.radians(lat2 - lat1)
     dlambda = math.radians(lon2 - lon1)
-    a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(
-        dlambda / 2
-    ) ** 2
+    a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
     return 2 * _EARTH_RADIUS_KM * math.asin(math.sqrt(a))
 
 
@@ -50,9 +46,7 @@ def bounding_box(
     )
 
 
-def point_in_polygon(
-    lon: float, lat: float, polygon: list[tuple[float, float]]
-) -> bool:
+def point_in_polygon(lon: float, lat: float, polygon: list[tuple[float, float]]) -> bool:
     """Ray-casting point-in-polygon test.
 
     Args:

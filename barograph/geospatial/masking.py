@@ -16,9 +16,7 @@ class PolygonMasker:
         keep_inside: When ``True`` (default) keep cells inside, else outside.
     """
 
-    def __init__(
-        self, polygons: list[list[tuple[float, float]]], keep_inside: bool = True
-    ) -> None:
+    def __init__(self, polygons: list[list[tuple[float, float]]], keep_inside: bool = True) -> None:
         if not polygons:
             raise ValueError("At least one polygon is required")
         self.polygons = polygons
@@ -26,9 +24,7 @@ class PolygonMasker:
 
     def mask(self, layer: RasterLayer) -> RasterLayer:
         """Return a copy of *layer* with out-of-region cells set to NaN."""
-        lats, lons = np.meshgrid(
-            np.asarray(layer.lats), np.asarray(layer.lons), indexing="ij"
-        )
+        lats, lons = np.meshgrid(np.asarray(layer.lats), np.asarray(layer.lons), indexing="ij")
         keep = np.zeros(lats.shape, dtype=bool)
         for poly in self.polygons:
             for i in range(lats.shape[0]):
@@ -53,9 +49,7 @@ class PolygonMasker:
         )
 
 
-def mask_outside_polygon(
-    layer: RasterLayer, polygon: list[tuple[float, float]]
-) -> RasterLayer:
+def mask_outside_polygon(layer: RasterLayer, polygon: list[tuple[float, float]]) -> RasterLayer:
     """Set all cells outside *polygon* to NaN."""
     return PolygonMasker([polygon], keep_inside=True).mask(layer)
 
@@ -69,12 +63,10 @@ def mask_radius(
     """Set all cells farther than *radius_km* from the center to NaN."""
     from barograph.geospatial.projection import haversine_distance
 
-    lats, lons = np.meshgrid(
-        np.asarray(layer.lats), np.asarray(layer.lons), indexing="ij"
+    lats, lons = np.meshgrid(np.asarray(layer.lats), np.asarray(layer.lons), indexing="ij")
+    dist = np.vectorize(lambda lo, la: haversine_distance(center_lon, center_lat, lo, la))(
+        lons, lats
     )
-    dist = np.vectorize(
-        lambda lo, la: haversine_distance(center_lon, center_lat, lo, la)
-    )(lons, lats)
     data = np.array(layer.data, dtype=np.float64, copy=True)
     if data.ndim == 3:
         data[:, dist > radius_km] = np.nan
