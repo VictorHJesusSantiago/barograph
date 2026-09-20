@@ -119,6 +119,7 @@ class GFSIngester:
             step = ds.step.values.item()
             if hasattr(step, "total_seconds"):
                 from datetime import timedelta
+
                 return ref + timedelta(seconds=step.total_seconds())
             return ref
         if "time" in ds.coords:
@@ -140,10 +141,7 @@ class GFSIngester:
         fh_str = f"{forecast_hour:03d}"
 
         base = "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl"
-        params = (
-            f"?file=gfs.t{cycle}z.pgrb2.0p25.f{fh_str}"
-            f"&dir=%2Fgfs.{date_str}%2F{cycle}%2Fatmos"
-        )
+        params = f"?file=gfs.t{cycle}z.pgrb2.0p25.f{fh_str}&dir=%2Fgfs.{date_str}%2F{cycle}%2Fatmos"
 
         out = Path(output_dir or self.data_dir)
         out.mkdir(parents=True, exist_ok=True)

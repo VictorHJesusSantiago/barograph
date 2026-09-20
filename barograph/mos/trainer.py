@@ -15,6 +15,7 @@ from barograph.mos.regressor import MOSRegressor
 @dataclass
 class MOSDataset:
     """Paired NWP-observation dataset ready for MOS training."""
+
     X: np.ndarray
     y: np.ndarray
     feature_names: list[str]
@@ -120,7 +121,10 @@ class MOSTrainer:
             samples = [obs_list[i] for i in idx]
             try:
                 models[sid] = self.train(
-                    fields, samples, target_variable="", algorithm=algorithm,
+                    fields,
+                    samples,
+                    target_variable="",
+                    algorithm=algorithm,
                     hyperparameters=hyperparameters,
                 )
             except Exception as e:
