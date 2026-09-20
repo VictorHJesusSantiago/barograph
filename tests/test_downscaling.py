@@ -15,8 +15,13 @@ def make_field(data: np.ndarray, var: Variable = Variable.TEMPERATURE) -> Gridde
     lons = np.linspace(-50, -45, data.shape[1])
     t = datetime(2026, 1, 1, 12)
     return GriddedField(
-        data=data, lats=lats, lons=lons, variable=var,
-        source=ModelSource.GFS, valid_time=t, init_time=t,
+        data=data,
+        lats=lats,
+        lons=lons,
+        variable=var,
+        source=ModelSource.GFS,
+        valid_time=t,
+        init_time=t,
     )
 
 

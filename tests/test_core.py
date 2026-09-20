@@ -61,8 +61,11 @@ def test_gridded_field_2d_min():
     data = np.full((2, 2), 5.0)
 
     field = GriddedField(
-        data=data, lats=lats, lons=lons,
-        variable=Variable.TEMPERATURE, source=ModelSource.GFS,
+        data=data,
+        lats=lats,
+        lons=lons,
+        variable=Variable.TEMPERATURE,
+        source=ModelSource.GFS,
         valid_time=datetime(2026, 1, 1, 12),
         init_time=datetime(2026, 1, 1, 0),
     )
@@ -77,11 +80,17 @@ def test_ensemble_forecast_mean():
     fields = []
     for m in range(3):
         data = np.full((4, 5), float(m + 1))
-        fields.append(GriddedField(
-            data=data, lats=lats, lons=lons,
-            variable=Variable.TEMPERATURE, source=ModelSource.GFS,
-            valid_time=t, init_time=t,
-        ))
+        fields.append(
+            GriddedField(
+                data=data,
+                lats=lats,
+                lons=lons,
+                variable=Variable.TEMPERATURE,
+                source=ModelSource.GFS,
+                valid_time=t,
+                init_time=t,
+            )
+        )
 
     ens = EnsembleForecast(
         members=fields,
@@ -105,9 +114,13 @@ def test_ensemble_member_ids():
 
     fields = [
         GriddedField(
-            data=np.full((2, 2), float(i)), lats=lats, lons=lons,
-            variable=Variable.TEMPERATURE, source=ModelSource.GFS,
-            valid_time=t, init_time=t,
+            data=np.full((2, 2), float(i)),
+            lats=lats,
+            lons=lons,
+            variable=Variable.TEMPERATURE,
+            source=ModelSource.GFS,
+            valid_time=t,
+            init_time=t,
         )
         for i in range(2)
     ]
