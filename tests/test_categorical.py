@@ -57,9 +57,9 @@ def test_ets_zero_for_no_samples():
 
 def test_frequency_bias_perfect_is_one():
     # balanced forecasts/observations -> bias 1
-    assert frequency_bias(
-        hits=4, misses=1, false_alarms=1, correct_negatives=2
-    ) == pytest.approx(1.0, rel=1e-6)
+    assert frequency_bias(hits=4, misses=1, false_alarms=1, correct_negatives=2) == pytest.approx(
+        1.0, rel=1e-6
+    )
 
 
 def test_peirce_skill_score():

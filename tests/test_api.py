@@ -13,6 +13,7 @@ from barograph.api.meteo import OpenMeteo
 def fake_transport(payload: dict, status: int = 200):
     def transport(url, **kwargs):
         return status, json.dumps(payload)
+
     return transport
 
 
@@ -87,8 +88,7 @@ def test_openmeteo_hourly_parsing():
             "temperature_2m": [10.0, None],
         }
     }
-    client = OpenMeteo(base_url=base,
-                       client=HTTPClient(transport=fake_transport(payload)))
+    client = OpenMeteo(base_url=base, client=HTTPClient(transport=fake_transport(payload)))
     hf = client.hourly(-23.5, -46.6, ["temperature_2m"], forecast_days=1)
     ts, vs = hf["temperature_2m"].to_series_data()
     assert ts[0].hour == 0
@@ -106,8 +106,7 @@ def test_openmeteo_daily_parsing():
             "wind_speed_10m_max": [22.0],
         }
     }
-    client = OpenMeteo(base_url=base,
-                       client=HTTPClient(transport=fake_transport(payload)))
+    client = OpenMeteo(base_url=base, client=HTTPClient(transport=fake_transport(payload)))
     daily = client.daily(-23.5, -46.6, forecast_days=1)
     assert len(daily) == 1
     assert daily.temperature_max == [28.0]
