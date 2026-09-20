@@ -72,9 +72,7 @@ class Extrapolator:
         from scipy.ndimage import map_coordinates
 
         coords = np.array([sy.ravel(), sx.ravel()])
-        extrapolated = map_coordinates(
-            field, coords, order=1, mode="nearest"
-        ).reshape(ny, nx)
+        extrapolated = map_coordinates(field, coords, order=1, mode="nearest").reshape(ny, nx)
 
         # Preserve original NaN structure
         extrapolated[~np.isfinite(extrapolated)] = np.nan
@@ -97,16 +95,20 @@ class Extrapolator:
         for lead in lead_times:
             lead_hours = lead.total_seconds() / 3600.0
             data = self.advect(last.data, u, v, lead_hours)
-            results.append(RadarSweep(
-                data=data,
-                lats=last.lats,
-                lons=last.lons,
-                scan_time=last.scan_time + lead,
-                elevation=last.elevation,
-                meta={**last.meta,
-                      "lead_minutes": lead.total_seconds() / 60.0,
-                      "method": "optical_flow_advection"},
-            ))
+            results.append(
+                RadarSweep(
+                    data=data,
+                    lats=last.lats,
+                    lons=last.lons,
+                    scan_time=last.scan_time + lead,
+                    elevation=last.elevation,
+                    meta={
+                        **last.meta,
+                        "lead_minutes": lead.total_seconds() / 60.0,
+                        "method": "optical_flow_advection",
+                    },
+                )
+            )
         return results
 
     def rainfall_rate(

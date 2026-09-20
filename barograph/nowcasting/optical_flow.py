@@ -61,21 +61,18 @@ class OpticalFlowNowcaster:
         else:
             return self._block_matching(f1, f2)
 
-    def _farneback(
-        self, f1: np.ndarray, f2: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
+    def _farneback(self, f1: np.ndarray, f2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         try:
             import cv2
         except ImportError as e:
-            raise ImportError(
-                "opencv-python is required for the farneback method"
-            ) from e
+            raise ImportError("opencv-python is required for the farneback method") from e
 
         p1 = (f1 * 255).astype(np.uint8)
         p2 = (f2 * 255).astype(np.uint8)
 
         flow = cv2.calcOpticalFlowFarneback(  # type: ignore[call-overload]
-            p1, p2,
+            p1,
+            p2,
             flow=None,
             pyr_scale=self.pyr_scale,
             levels=self.levels,
@@ -89,29 +86,30 @@ class OpticalFlowNowcaster:
         v = flow[..., 1]
         return u, v
 
-    def _lucas_kanade(
-        self, f1: np.ndarray, f2: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
+    def _lucas_kanade(self, f1: np.ndarray, f2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         try:
             import cv2
         except ImportError as e:
-            raise ImportError(
-                "opencv-python is required for the lucas_kanade method"
-            ) from e
+            raise ImportError("opencv-python is required for the lucas_kanade method") from e
 
         p1 = (f1 * 255).astype(np.uint8)
         p2 = (f2 * 255).astype(np.uint8)
 
         # Detect good features to track (grid of points)
         step = max(8, p1.shape[0] // 20)
-        y_coords, x_coords = np.mgrid[step // 2:p1.shape[0]:step, step // 2:p1.shape[1]:step]
+        y_coords, x_coords = np.mgrid[
+            step // 2 : p1.shape[0] : step, step // 2 : p1.shape[1] : step
+        ]
         pts = np.column_stack([x_coords.ravel(), y_coords.ravel()]).astype(np.float32)
 
         if len(pts) == 0:
             return np.zeros_like(f1), np.zeros_like(f1)
 
         next_pts, st, err = cv2.calcOpticalFlowPyrLK(  # type: ignore[call-overload]
-            p1, p2, pts, None,
+            p1,
+            p2,
+            pts,
+            None,
             winSize=(self.winsize, self.winsize),
             maxLevel=self.levels,
             criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 30, 0.01),
@@ -124,31 +122,24 @@ class OpticalFlowNowcaster:
         if np.any(valid):
             pts_v = pts[valid]
             nxt_v = next_pts[valid]
-            u[y_coords.ravel()[valid], x_coords.ravel()[valid]] = (
-                nxt_v[:, 0] - pts_v[:, 0]
-            )
-            v[y_coords.ravel()[valid], x_coords.ravel()[valid]] = (
-                nxt_v[:, 1] - pts_v[:, 1]
-            )
+            u[y_coords.ravel()[valid], x_coords.ravel()[valid]] = nxt_v[:, 0] - pts_v[:, 0]
+            v[y_coords.ravel()[valid], x_coords.ravel()[valid]] = nxt_v[:, 1] - pts_v[:, 1]
 
         # Interpolate sparse flow to dense grid
         from scipy.interpolate import griddata
+
         good = ~np.isnan(u)
         if np.sum(good) < 3:
             return np.zeros_like(f1), np.zeros_like(f1)
 
-        pts_flat = np.column_stack([
-            np.where(good)[1], np.where(good)[0]
-        ])
+        pts_flat = np.column_stack([np.where(good)[1], np.where(good)[0]])
         grid_x, grid_y = np.meshgrid(np.arange(f1.shape[1]), np.arange(f1.shape[0]))
         u_dense = griddata(pts_flat, u[good], (grid_x, grid_y), method="cubic", fill_value=0)
         v_dense = griddata(pts_flat, v[good], (grid_x, grid_y), method="cubic", fill_value=0)
 
         return np.nan_to_num(u_dense), np.nan_to_num(v_dense)
 
-    def _block_matching(
-        self, f1: np.ndarray, f2: np.ndarray
-    ) -> tuple[np.ndarray, np.ndarray]:
+    def _block_matching(self, f1: np.ndarray, f2: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """Simple block matching with a fixed search window."""
         ny, nx = f1.shape
         block = 16
@@ -193,6 +184,7 @@ class OpticalFlowNowcaster:
     ) -> tuple[np.ndarray, np.ndarray]:
         """Smooth the flow field using a Gaussian filter."""
         from scipy.ndimage import gaussian_filter
+
         u_s = gaussian_filter(np.nan_to_num(u), sigma=sigma, mode="nearest")
         v_s = gaussian_filter(np.nan_to_num(v), sigma=sigma, mode="nearest")
         return u_s, v_s
