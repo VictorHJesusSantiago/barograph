@@ -11,7 +11,8 @@ def alert_to_message(alert: ThresholdAlert) -> NotificationMessage:
     """Convert a ``ThresholdAlert`` into a deliverable notification message."""
     return NotificationMessage(
         title=f"{alert.severity}: {alert.variable.value} alert",
-        body=alert.message or (
+        body=alert.message
+        or (
             f"{alert.variable.value} = {alert.value:.2f} "
             f"(threshold {alert.threshold} {alert.operator}) at "
             f"{alert.location.latitude:.3f},{alert.location.longitude:.3f}"

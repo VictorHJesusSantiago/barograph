@@ -122,7 +122,9 @@ class NotificationManager:
 
     def _to_log(self, payload: dict[str, Any]) -> NotifyResult:
         level = {
-            "critical": "ERROR", "warning": "WARNING", "info": "INFO",
+            "critical": "ERROR",
+            "warning": "WARNING",
+            "info": "INFO",
         }.get(payload["severity"], "INFO")
         logger.log(level, f"{payload['title']}: {payload['body']}")
         return NotifyResult(channel="log", delivered=True, timestamp=time.time())
@@ -133,8 +135,12 @@ class NotificationManager:
         self.file_path.parent.mkdir(parents=True, exist_ok=True)
         with open(self.file_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(payload) + "\n")
-        return NotifyResult(channel="file", delivered=True, timestamp=time.time(),
-                            detail={"path": str(self.file_path)})
+        return NotifyResult(
+            channel="file",
+            delivered=True,
+            timestamp=time.time(),
+            detail={"path": str(self.file_path)},
+        )
 
     def _payload_for(self, channel: str, payload: dict[str, Any]) -> dict[str, Any]:
         if channel == "slack":
@@ -146,21 +152,23 @@ class NotificationManager:
                 payload["severity"], 3447003
             )
             return {
-                "embeds": [{
-                    "title": payload["title"],
-                    "description": payload["body"],
-                    "color": color,
-                    "fields": [{"name": k, "value": str(v), "inline": True}
-                               for k, v in payload["tags"].items()],
-                }]
+                "embeds": [
+                    {
+                        "title": payload["title"],
+                        "description": payload["body"],
+                        "color": color,
+                        "fields": [
+                            {"name": k, "value": str(v), "inline": True}
+                            for k, v in payload["tags"].items()
+                        ],
+                    }
+                ]
             }
         if channel == "mattermost":
             return {"text": f"**{payload['title']}**\n{payload['body']}"}
         return payload
 
-    def _webhook_with_retry(
-        self, channel: str, payload: dict[str, Any]
-    ) -> NotifyResult:
+    def _webhook_with_retry(self, channel: str, payload: dict[str, Any]) -> NotifyResult:
         url = self.webhook_url
         if channel == "webhook" and url is None:
             raise ValueError("webhook channel requires a webhook_url")
@@ -173,16 +181,23 @@ class NotificationManager:
             try:
                 self._http_post(url, body)  # type: ignore[arg-type]
                 return NotifyResult(
-                    channel=channel, delivered=True, attempts=attempts,
-                    timestamp=time.time(), detail={"url": url},
+                    channel=channel,
+                    delivered=True,
+                    attempts=attempts,
+                    timestamp=time.time(),
+                    detail={"url": url},
                 )
             except Exception as exc:  # noqa: BLE001
                 last_error = str(exc)
                 if attempt < self.max_retries:
                     time.sleep(self.backoff_base * (2**attempt))
         return NotifyResult(
-            channel=channel, delivered=False, attempts=attempts,
-            error=last_error, timestamp=time.time(), detail={"url": url},
+            channel=channel,
+            delivered=False,
+            attempts=attempts,
+            error=last_error,
+            timestamp=time.time(),
+            detail={"url": url},
         )
 
     def _http_post(self, url: str, body: dict[str, Any]) -> bool:
@@ -191,9 +206,7 @@ class NotificationManager:
         import urllib.request
 
         data = json.dumps(body).encode("utf-8")
-        req = urllib.request.Request(
-            url, data=data, headers={"Content-Type": "application/json"}
-        )
+        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
         with urllib.request.urlopen(req, timeout=self.timeout_seconds) as resp:  # noqa: S310
             if 200 <= resp.status < 300:
                 return True
@@ -210,8 +223,12 @@ class NotificationManager:
         use_tls: bool = True,
     ) -> None:
         self._email_config = {
-            "smtp_host": smtp_host, "smtp_port": smtp_port, "username": username,
-            "password": password, "sender": sender, "use_tls": use_tls,
+            "smtp_host": smtp_host,
+            "smtp_port": smtp_port,
+            "username": username,
+            "password": password,
+            "sender": sender,
+            "use_tls": use_tls,
         }
 
     def _email(self, payload: dict[str, Any]) -> NotifyResult:
