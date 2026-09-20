@@ -16,14 +16,23 @@ def make_ensemble(n_members=20, ny=8, nx=10, mean=100, std=10, seed=0):
     members = []
     for _ in range(n_members):
         data = mean + std * rng.standard_normal((ny, nx))
-        members.append(GriddedField(
-            data=data, lats=lats, lons=lons,
-            variable=Variable.PRECIPITATION, source=ModelSource.GFS,
-            valid_time=t, init_time=t,
-        ))
+        members.append(
+            GriddedField(
+                data=data,
+                lats=lats,
+                lons=lons,
+                variable=Variable.PRECIPITATION,
+                source=ModelSource.GFS,
+                valid_time=t,
+                init_time=t,
+            )
+        )
     return EnsembleForecast(
-        members=members, variable=Variable.PRECIPITATION, source=ModelSource.GFS,
-        init_time=t, valid_time=t,
+        members=members,
+        variable=Variable.PRECIPITATION,
+        source=ModelSource.GFS,
+        init_time=t,
+        valid_time=t,
     )
 
 

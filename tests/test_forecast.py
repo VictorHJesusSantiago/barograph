@@ -17,9 +17,12 @@ def make_field(init, valid, val):
     lons = np.linspace(-50.0, -45.0, 8)
     return GriddedField(
         data=np.full((8, 8), val, dtype=np.float32),
-        lats=lats, lons=lons,
-        variable=Variable.TEMPERATURE, source=ModelSource.GFS,
-        valid_time=valid, init_time=init,
+        lats=lats,
+        lons=lons,
+        variable=Variable.TEMPERATURE,
+        source=ModelSource.GFS,
+        valid_time=valid,
+        init_time=init,
     )
 
 
@@ -51,8 +54,7 @@ def test_cycle_mask_within():
 
 def test_cycle_summary():
     init = datetime(2026, 1, 1, 0)
-    cycle = ForecastCycle(init_time=init,
-                          fields=[make_field(init, init + timedelta(hours=6), 1.0)])
+    cycle = ForecastCycle(init_time=init, fields=[make_field(init, init + timedelta(hours=6), 1.0)])
     summary = cycle.summary()
     assert summary["n_fields"] == 1
     assert summary["leading_hours"] == [6.0]
@@ -85,9 +87,12 @@ def test_blend_requires_alignment():
     lats = np.linspace(-20.0, -10.0, 8)
     f2 = GriddedField(
         data=np.full((8, 8), 2.0, dtype=np.float32),
-        lats=lats, lons=f1.lons,
-        variable=Variable.TEMPERATURE, source=ModelSource.GFS,
-        valid_time=f1.valid_time, init_time=init,
+        lats=lats,
+        lons=f1.lons,
+        variable=Variable.TEMPERATURE,
+        source=ModelSource.GFS,
+        valid_time=f1.valid_time,
+        init_time=init,
     )
     with pytest.raises(ValueError):
         ForecastBlender().blend([f1, f2])
