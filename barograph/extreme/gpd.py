@@ -70,9 +70,7 @@ def fit_gpd(excesses: np.ndarray, threshold: float) -> GPDDistribution:
     j = np.arange(1, n + 1)
     b0 = s.mean()
     b1 = np.mean(s * (j - 1.0) / (n - 1.0))
-    b2 = np.mean(
-        s * (j - 1.0) * (j - 2.0) / ((n - 1.0) * (n - 2.0))
-    ) if n > 2 else b1
+    b2 = np.mean(s * (j - 1.0) * (j - 2.0) / ((n - 1.0) * (n - 2.0))) if n > 2 else b1
     # L-moments
     lam2 = 2.0 * b1 - b0
     lam3 = 6.0 * b2 - 6.0 * b1 + b0
@@ -86,8 +84,7 @@ def fit_gpd(excesses: np.ndarray, threshold: float) -> GPDDistribution:
     scale = lam2 * (1.0 - shape) * (2.0 - shape)
     if not np.isfinite(scale) or scale <= 0:
         return GPDDistribution(scale=lam2, shape=0.0, threshold=threshold)
-    return GPDDistribution(scale=float(scale), shape=float(shape),
-                           threshold=float(threshold))
+    return GPDDistribution(scale=float(scale), shape=float(shape), threshold=float(threshold))
 
 
 def return_level(dist: GPDDistribution, period: np.ndarray) -> np.ndarray:

@@ -52,9 +52,7 @@ def annual_maxima(values: np.ndarray, times: list[datetime]) -> np.ndarray:
     return np.array(list(years.values()), dtype=np.float64)
 
 
-def peak_over_threshold(
-    values: np.ndarray, threshold: float
-) -> np.ndarray:
+def peak_over_threshold(values: np.ndarray, threshold: float) -> np.ndarray:
     """Return the exceedances of *threshold* (peaks over threshold).
 
     Only the positive deviation (excess) above the threshold is returned,
