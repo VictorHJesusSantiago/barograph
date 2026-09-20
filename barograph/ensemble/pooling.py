@@ -70,12 +70,16 @@ class EnsemblePooler:
             out = np.empty((len(probs),) + sorted_members.shape[1:])
             for k, p in enumerate(probs):
                 out[k] = np.interp(
-                    p, emp_quantiles, sorted_members, left=sorted_members[0],
+                    p,
+                    emp_quantiles,
+                    sorted_members,
+                    left=sorted_members[0],
                     right=sorted_members[-1],
                 )
             return out
 
         from scipy import stats
+
         mean = params["mean"]
         std = params["std"]
 
@@ -86,14 +90,13 @@ class EnsemblePooler:
             elif self.distribution == "lognormal":
                 out[k] = stats.lognorm.ppf(p, s=std, scale=np.exp(mean))
             else:
-                out[k] = stats.truncnorm.ppf(
-                    p, a=-3, b=3, loc=mean, scale=std
-                )
+                out[k] = stats.truncnorm.ppf(p, a=-3, b=3, loc=mean, scale=std)
         return out
 
     def cdf(self, params: dict[str, np.ndarray], x: float | np.ndarray) -> np.ndarray:
         """Evaluate the CDF at given values."""
         from scipy import stats
+
         mean = params["mean"]
         std = params["std"]
 

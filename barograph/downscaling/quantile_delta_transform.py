@@ -19,9 +19,7 @@ class QDTDownscaler(BaseDownscaler):
     name = "quantile_delta_transform"
 
     def __init__(self, quantiles: np.ndarray | None = None):
-        self.quantiles = (
-            np.arange(0.001, 1.0, 0.002) if quantiles is None else quantiles
-        )
+        self.quantiles = np.arange(0.001, 1.0, 0.002) if quantiles is None else quantiles
         self._coarse_quantiles: np.ndarray | None = None
         self._fine_quantiles: np.ndarray | None = None
         self._fitted = False
@@ -44,12 +42,8 @@ class QDTDownscaler(BaseDownscaler):
             )
 
         ny, nx = c_arr.shape[-2:]
-        self._coarse_quantiles = np.full(
-            (len(self.quantiles), ny, nx), np.nan, dtype=np.float32
-        )
-        self._fine_quantiles = np.full(
-            (len(self.quantiles), ny, nx), np.nan, dtype=np.float32
-        )
+        self._coarse_quantiles = np.full((len(self.quantiles), ny, nx), np.nan, dtype=np.float32)
+        self._fine_quantiles = np.full((len(self.quantiles), ny, nx), np.nan, dtype=np.float32)
 
         for i in range(ny):
             for j in range(nx):
