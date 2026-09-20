@@ -33,9 +33,11 @@ class MOSRegressor:
     def _build_model(self):
         if self.algorithm == "linear":
             from sklearn.linear_model import Ridge
+
             return Ridge(alpha=self.hyperparameters.get("alpha", 1.0))
         elif self.algorithm == "gradient_boosting":
             from sklearn.ensemble import GradientBoostingRegressor
+
             return GradientBoostingRegressor(
                 n_estimators=self.hyperparameters.get("n_estimators", 200),
                 learning_rate=self.hyperparameters.get("learning_rate", 0.05),
@@ -44,6 +46,7 @@ class MOSRegressor:
             )
         elif self.algorithm == "random_forest":
             from sklearn.ensemble import RandomForestRegressor
+
             return RandomForestRegressor(
                 n_estimators=self.hyperparameters.get("n_estimators", 300),
                 random_state=42,
@@ -127,8 +130,14 @@ class MOSRegressor:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "wb") as f:
-            pickle.dump({"model": self._model, "feat_names": self._feature_names,
-                         "algorithm": self.algorithm}, f)
+            pickle.dump(
+                {
+                    "model": self._model,
+                    "feat_names": self._feature_names,
+                    "algorithm": self.algorithm,
+                },
+                f,
+            )
         return path
 
     @classmethod

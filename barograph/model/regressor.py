@@ -59,9 +59,7 @@ class FeatureSelector:
     keep: int = 8
     _selected: list[str] = field(default_factory=list, repr=False)
 
-    def fit(
-        self, X: np.ndarray, y: np.ndarray, feature_names: list[str]
-    ) -> FeatureSelector:
+    def fit(self, X: np.ndarray, y: np.ndarray, feature_names: list[str]) -> FeatureSelector:
         """Rank features by absolute correlation and store the top *keep*."""
         n = max(self.keep, 1)
         if X.shape[1] == 0:
@@ -122,9 +120,7 @@ class RegressionPipeline:
         self.kind = kind
         self.kwargs = kwargs
         self.feature_selection = feature_selection
-        self.selector = (
-            FeatureSelector(keep=feature_selection) if feature_selection else None
-        )
+        self.selector = FeatureSelector(keep=feature_selection) if feature_selection else None
         self.model: RegressionModel | None = None
 
     def fit(
