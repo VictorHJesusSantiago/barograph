@@ -34,8 +34,9 @@ class ForecastCycle:
                 return f
         return None
 
-    def mask_within(self, lat_min: float, lat_max: float,
-                    lon_min: float, lon_max: float) -> ForecastCycle:
+    def mask_within(
+        self, lat_min: float, lat_max: float, lon_min: float, lon_max: float
+    ) -> ForecastCycle:
         """Return a new cycle clipped to a bounding box."""
         clipped = []
         for f in self.fields:
@@ -45,17 +46,19 @@ class ForecastCycle:
                 data = f.data[np.ix_(lat_mask, lon_mask)]
             else:
                 data = f.data[..., np.ix_(lat_mask, lon_mask)]
-            clipped.append(GriddedField(
-                data=data.copy(),
-                lats=f.lats[lat_mask].copy(),
-                lons=f.lons[lon_mask].copy(),
-                variable=f.variable,
-                source=f.source,
-                valid_time=f.valid_time,
-                init_time=f.init_time,
-                level=f.level,
-                meta=f.meta,
-            ))
+            clipped.append(
+                GriddedField(
+                    data=data.copy(),
+                    lats=f.lats[lat_mask].copy(),
+                    lons=f.lons[lon_mask].copy(),
+                    variable=f.variable,
+                    source=f.source,
+                    valid_time=f.valid_time,
+                    init_time=f.init_time,
+                    level=f.level,
+                    meta=f.meta,
+                )
+            )
         return ForecastCycle(init_time=self.init_time, fields=clipped)
 
     def sort(self) -> None:

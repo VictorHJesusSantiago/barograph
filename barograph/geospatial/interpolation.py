@@ -63,10 +63,7 @@ class IDWInterpolator:
         obs_xy: np.ndarray,
         values: np.ndarray,
     ) -> float:
-        dists = np.array(
-            [haversine_distance(lon, lat, float(p[0]), float(p[1]))
-             for p in obs_xy]
-        )
+        dists = np.array([haversine_distance(lon, lat, float(p[0]), float(p[1])) for p in obs_xy])
         order = np.argsort(dists)[: self.max_points]
         nearest = dists[order] + self.smoothing
         weights = 1.0 / np.maximum(nearest, 1e-9) ** self.power
@@ -90,10 +87,7 @@ class NearestInterpolator:
         out = np.empty((len(grid_lons), len(grid_lats)), dtype=np.float64)
         for j, glat in enumerate(grid_lats):
             for i, glon in enumerate(grid_lons):
-                dists = [
-                    haversine_distance(glon, glat, float(p[0]), float(p[1]))
-                    for p in obs_xy
-                ]
+                dists = [haversine_distance(glon, glat, float(p[0]), float(p[1])) for p in obs_xy]
                 out[i, j] = values[int(np.argmin(dists))]
         return out
 
@@ -106,8 +100,9 @@ class SimpleKriging:
     observations and solves the kriging weights via a linear system.
     """
 
-    def __init__(self, nugget: float = 0.1, range_km: float = 50.0,
-                 sill: float | None = None) -> None:
+    def __init__(
+        self, nugget: float = 0.1, range_km: float = 50.0, sill: float | None = None
+    ) -> None:
         self.nugget = nugget
         self.range_km = range_km
         self.sill = sill
@@ -130,8 +125,10 @@ class SimpleKriging:
         for i in range(m):
             for j in range(m):
                 d = haversine_distance(
-                    float(obs_xy[i, 0]), float(obs_xy[i, 1]),
-                    float(obs_xy[j, 0]), float(obs_xy[j, 1]),
+                    float(obs_xy[i, 0]),
+                    float(obs_xy[i, 1]),
+                    float(obs_xy[j, 0]),
+                    float(obs_xy[j, 1]),
                 )
                 A[i, j] = self._variogram(d, sill)
             A[i, m] = 1.0
@@ -143,8 +140,10 @@ class SimpleKriging:
                 b = np.ones(m + 1)
                 for k in range(m):
                     d = haversine_distance(
-                        glon, glat,
-                        float(obs_xy[k, 0]), float(obs_xy[k, 1]),
+                        glon,
+                        glat,
+                        float(obs_xy[k, 0]),
+                        float(obs_xy[k, 1]),
                     )
                     b[k] = self._variogram(d, sill)
                 b[m] = 1.0
@@ -165,9 +164,7 @@ class SimpleKriging:
         if h >= r:
             gamma = sill
         else:
-            gamma = self.nugget + (sill - self.nugget) * (
-                1.5 * h / r - 0.5 * (h / r) ** 3
-            )
+            gamma = self.nugget + (sill - self.nugget) * (1.5 * h / r - 0.5 * (h / r) ** 3)
         return gamma
 
 
@@ -189,9 +186,7 @@ def interpolate_station_field(
         method: One of ``"idw"`` or ``"nearest"``.
     """
     if method == "idw":
-        data = IDWInterpolator().fit_predict(
-            obs_lons, obs_lats, obs_values, grid_lons, grid_lats
-        )
+        data = IDWInterpolator().fit_predict(obs_lons, obs_lats, obs_values, grid_lons, grid_lats)
     elif method == "nearest":
         data = NearestInterpolator().fit_predict(
             obs_lons, obs_lats, obs_values, grid_lons, grid_lats
