@@ -63,9 +63,7 @@ class VerificationConfig:
     metrics: list[str] = field(
         default_factory=lambda: ["crps", "brier", "reliability", "bias", "mae", "rmse"]
     )
-    brier_thresholds: list[float] = field(
-        default_factory=lambda: [0.1, 1.0, 5.0, 10.0, 25.0, 50.0]
-    )
+    brier_thresholds: list[float] = field(default_factory=lambda: [0.1, 1.0, 5.0, 10.0, 25.0, 50.0])
     reliability_bins: int = 10
     output_dir: str = "./output/verification"
 
@@ -74,9 +72,7 @@ class VerificationConfig:
 class NowcastingConfig:
     optical_flow_method: str = "lucas_kanade"
     flow_radius: int = 12
-    extrapolation_minutes: list[int] = field(
-        default_factory=lambda: [15, 30, 45, 60, 90, 120]
-    )
+    extrapolation_minutes: list[int] = field(default_factory=lambda: [15, 30, 45, 60, 90, 120])
     radar_composite_url: str = ""
     min_reflectivity_dbz: float = 0.0
     max_reflectivity_dbz: float = 70.0
@@ -156,9 +152,17 @@ def load_config(path: str | Path | None = None) -> Settings:
             raw = yaml.safe_load(f) or {}
 
         for section_name in [
-            "ingestion", "downscaling", "mos", "ensemble",
-            "postprocessing", "verification", "nowcasting", "alerts",
-            "raster", "notifications", "output",
+            "ingestion",
+            "downscaling",
+            "mos",
+            "ensemble",
+            "postprocessing",
+            "verification",
+            "nowcasting",
+            "alerts",
+            "raster",
+            "notifications",
+            "output",
         ]:
             if section_name in raw:
                 section = getattr(settings, section_name)

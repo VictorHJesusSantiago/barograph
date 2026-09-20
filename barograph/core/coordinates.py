@@ -75,7 +75,10 @@ def reproject_field(
 
     if dst_lats.ndim == 1:
         dst_mesh_lats, dst_mesh_lons = np.meshgrid(
-            dst_lats, dst_lons, indexing="ij", copy=False,
+            dst_lats,
+            dst_lons,
+            indexing="ij",
+            copy=False,
         )
     else:
         dst_mesh_lats, dst_mesh_lons = dst_lats, dst_lons
@@ -87,7 +90,10 @@ def reproject_field(
 
     if data.ndim == 2:
         interp = RegularGridInterpolator(
-            (src_lats, src_lons), data, method=method, bounds_error=False,
+            (src_lats, src_lons),
+            data,
+            method=method,
+            bounds_error=False,
         )
         result = interp(dst_grid).reshape(out_shape)
     elif data.ndim == 3:
@@ -95,18 +101,25 @@ def reproject_field(
         result = np.empty((n_time, out_shape[0], out_shape[1]), dtype=data.dtype)
         for t in range(n_time):
             interp = RegularGridInterpolator(
-                (src_lats, src_lons), data[t], method=method, bounds_error=False,
+                (src_lats, src_lons),
+                data[t],
+                method=method,
+                bounds_error=False,
             )
             result[t] = interp(dst_grid).reshape(out_shape)
     elif data.ndim == 4:
         n_time, n_level = data.shape[0], data.shape[1]
         result = np.empty(
-            (n_time, n_level, out_shape[0], out_shape[1]), dtype=data.dtype,
+            (n_time, n_level, out_shape[0], out_shape[1]),
+            dtype=data.dtype,
         )
         for t in range(n_time):
             for k in range(n_level):
                 interp = RegularGridInterpolator(
-                    (src_lats, src_lons), data[t, k], method=method, bounds_error=False,
+                    (src_lats, src_lons),
+                    data[t, k],
+                    method=method,
+                    bounds_error=False,
                 )
                 result[t, k] = interp(dst_grid).reshape(out_shape)
     else:
