@@ -43,8 +43,7 @@ class ForecastBlender:
             if f.shape != ref.shape or not np.allclose(f.lats, ref.lats):
                 raise ValueError("All forecasts must be aligned for blending")
 
-        ages_h = np.array([(f.valid_time - f.init_time).total_seconds() / 3600
-                           for f in forecasts])
+        ages_h = np.array([(f.valid_time - f.init_time).total_seconds() / 3600 for f in forecasts])
         w = 1.0 / (1.0 + ages_h)
         w = w / w.sum()
 
@@ -73,6 +72,5 @@ class ForecastBlender:
             name=field.variable.value,
             crs=CRS(),
             units="",
-            meta={"variable": field.variable.value,
-                  "source": field.source.value},
+            meta={"variable": field.variable.value, "source": field.source.value},
         )

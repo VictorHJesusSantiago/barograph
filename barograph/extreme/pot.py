@@ -61,16 +61,16 @@ def pot_return_level(
         raise ValueError("No finite values supplied")
     excess = peak_over_threshold(valid, threshold)
     if excess.size < 3:
-        raise ValueError(
-            f"Need at least 3 excesses above threshold {threshold}, got {excess.size}"
-        )
+        raise ValueError(f"Need at least 3 excesses above threshold {threshold}, got {excess.size}")
     dist = fit_gpd(excess, threshold=threshold)
     exceedance_fraction = excess_rate(valid, threshold)
-    rate_per_block = exceedance_fraction * valid.size / n_blocks if n_blocks else (
-        exceedance_fraction
+    rate_per_block = (
+        exceedance_fraction * valid.size / n_blocks if n_blocks else (exceedance_fraction)
     )
     dist = GPDDistribution(
-        scale=dist.scale, shape=dist.shape, threshold=threshold,
+        scale=dist.scale,
+        shape=dist.shape,
+        threshold=threshold,
         n_year=rate_per_block,
     )
     result = POTResult(
