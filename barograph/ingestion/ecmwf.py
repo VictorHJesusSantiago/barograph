@@ -127,17 +127,19 @@ class ECMWFIngester:
 
                 var_enum = Variable.from_value(variable)
 
-                results.append(GriddedField(
-                    data=data.astype(np.float32),
-                    lats=lats.astype(np.float32),
-                    lons=lons.astype(np.float32),
-                    variable=var_enum,
-                    source=ModelSource.ECMWF,
-                    init_time=self._extract_init_time(ds),
-                    valid_time=self._extract_valid_time(ds),
-                    level=lev,
-                    meta={"file": str(file_path)},
-                ))
+                results.append(
+                    GriddedField(
+                        data=data.astype(np.float32),
+                        lats=lats.astype(np.float32),
+                        lons=lons.astype(np.float32),
+                        variable=var_enum,
+                        source=ModelSource.ECMWF,
+                        init_time=self._extract_init_time(ds),
+                        valid_time=self._extract_valid_time(ds),
+                        level=lev,
+                        meta={"file": str(file_path)},
+                    )
+                )
             except Exception as e:
                 logger.warning(f"Failed to parse level {lev}: {e}")
         return results
@@ -155,6 +157,7 @@ class ECMWFIngester:
             step = ds.step.values.item()
             if hasattr(step, "total_seconds"):
                 from datetime import timedelta
+
                 return ref + timedelta(seconds=step.total_seconds())
             return ref
         return utcnow()

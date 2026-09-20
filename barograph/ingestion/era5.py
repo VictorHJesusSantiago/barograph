@@ -125,29 +125,33 @@ class ERA5Ingester:
                 data = ds_var.isel(time=t).values
                 var_enum = Variable.from_value(variable)
                 valid_time = ds_var.time.values[t].item()
-                results.append(GriddedField(
+                results.append(
+                    GriddedField(
+                        data=data.astype(np.float32),
+                        lats=lats.astype(np.float32),
+                        lons=lons.astype(np.float32),
+                        variable=var_enum,
+                        source=ModelSource.ERA5,
+                        init_time=valid_time,
+                        valid_time=valid_time,
+                        meta={"zarr_path": str(zarr_path), "time_index": t},
+                    )
+                )
+        else:
+            data = ds_var.values
+            var_enum = Variable.from_value(variable)
+            now = utcnow()
+            results.append(
+                GriddedField(
                     data=data.astype(np.float32),
                     lats=lats.astype(np.float32),
                     lons=lons.astype(np.float32),
                     variable=var_enum,
                     source=ModelSource.ERA5,
-                    init_time=valid_time,
-                    valid_time=valid_time,
-                    meta={"zarr_path": str(zarr_path), "time_index": t},
-                ))
-        else:
-            data = ds_var.values
-            var_enum = Variable.from_value(variable)
-            now = utcnow()
-            results.append(GriddedField(
-                data=data.astype(np.float32),
-                lats=lats.astype(np.float32),
-                lons=lons.astype(np.float32),
-                variable=var_enum,
-                source=ModelSource.ERA5,
-                init_time=now,
-                valid_time=now,
-            ))
+                    init_time=now,
+                    valid_time=now,
+                )
+            )
 
         return results
 
