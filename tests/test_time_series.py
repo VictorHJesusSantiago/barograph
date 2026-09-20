@@ -74,8 +74,7 @@ def test_precipitation_events_gap_separates():
 
 
 def test_analyzer_summary():
-    analyzer = TimeSeriesAnalyzer(np.array([1.0, 2.0, 3.0, 4.0]),
-                                  hourly_times(4))
+    analyzer = TimeSeriesAnalyzer(np.array([1.0, 2.0, 3.0, 4.0]), hourly_times(4))
     s = analyzer.summary()
     assert s["mean"] == 2.5
     assert s["n_obs"] == 4.0

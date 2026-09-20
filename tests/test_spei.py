@@ -78,5 +78,4 @@ def test_spei_window_edges_nan():
 
 
 def test_spei_short_series():
-    assert np.all(np.isnan(compute_spei(np.array([1.0, 2.0]),
-                                        np.array([1.0, 2.0]), 0.0, 10)))
+    assert np.all(np.isnan(compute_spei(np.array([1.0, 2.0]), np.array([1.0, 2.0]), 0.0, 10)))
