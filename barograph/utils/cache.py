@@ -19,6 +19,7 @@ class TTLCache:
 
     def _key_path(self, key: str) -> Path:
         import hashlib
+
         digest = hashlib.md5(key.encode()).hexdigest()
         return self.cache_dir / f"{digest}.pkl"
 
@@ -39,6 +40,7 @@ class TTLCache:
 
         try:
             import pickle
+
             with open(data_path, "rb") as f:
                 return pickle.load(f)
         except Exception as e:
@@ -48,6 +50,7 @@ class TTLCache:
     def set(self, key: str, value: Any) -> None:
         """Store in cache."""
         import pickle
+
         try:
             with open(self._key_path(key), "wb") as f:
                 pickle.dump(value, f)
@@ -89,5 +92,7 @@ def memoize(ttl_hours: float = 6.0, cache_dir: str | Path | None = None):
             result = func(*args, **kwargs)
             cache.set(key, result)
             return result
+
         return wrapper
+
     return decorator

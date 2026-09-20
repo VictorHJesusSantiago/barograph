@@ -54,12 +54,8 @@ def load_gridded_field(path: str | Path) -> GriddedField:
     except ValueError:
         source = ModelSource.GFS
 
-    valid_time = datetime.fromisoformat(
-        ds.attrs.get("valid_time", utcnow().isoformat())
-    )
-    init_time = datetime.fromisoformat(
-        ds.attrs.get("init_time", valid_time.isoformat())
-    )
+    valid_time = datetime.fromisoformat(ds.attrs.get("valid_time", utcnow().isoformat()))
+    init_time = datetime.fromisoformat(ds.attrs.get("init_time", valid_time.isoformat()))
 
     level = ds.attrs.get("level")
     try:
@@ -91,8 +87,7 @@ def save_ensemble(fields, path: str | Path) -> Path:
             "latitude": fields[0].lats,
             "longitude": fields[0].lons,
         },
-        attrs={"variable": fields[0].variable.value,
-               "source": fields[0].source.value},
+        attrs={"variable": fields[0].variable.value, "source": fields[0].source.value},
     )
     ds.to_netcdf(path)
     return path
