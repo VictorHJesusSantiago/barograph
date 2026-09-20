@@ -63,10 +63,7 @@ def apparent_temperature(
     e = vapor_pressure(temperature, relative_humidity_in)
     v = wind_speed
     at = (
-        temperature
-        + 0.33 * e
-        - 0.70 * wind_chill(temperature, v * 3.6)
-        - 4.00
+        temperature + 0.33 * e - 0.70 * wind_chill(temperature, v * 3.6) - 4.00
         if v > 0.0
         else temperature + 0.33 * e
     )

@@ -14,9 +14,7 @@ def saturation_vapor_pressure(temperature: float) -> float:
     return 6.1094 * np.exp((17.625 * temperature) / (temperature + 243.04))
 
 
-def vapor_pressure(
-    temperature: float, relative_humidity_in: float
-) -> float:
+def vapor_pressure(temperature: float, relative_humidity_in: float) -> float:
     """Actual vapour pressure (hPa).
 
     Args:
@@ -27,16 +25,12 @@ def vapor_pressure(
     return rh / 100.0 * saturation_vapor_pressure(temperature)
 
 
-def dewpoint(
-    temperature: float, relative_humidity_in: float
-) -> float:
+def dewpoint(temperature: float, relative_humidity_in: float) -> float:
     """Dewpoint temperature (Celsius) from temperature and relative humidity."""
     rh = np.clip(relative_humidity_in, 0.0, 100.0)
     if rh <= 1e-9:
         return float("-inf")
-    gamma = np.log(rh / 100.0) + (17.625 * temperature) / (
-        temperature + 243.04
-    )
+    gamma = np.log(rh / 100.0) + (17.625 * temperature) / (temperature + 243.04)
     return 243.04 * gamma / (17.625 - gamma)
 
 
