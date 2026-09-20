@@ -92,8 +92,17 @@ def test_raster_group_help(runner):
 def test_cli_help_lists_new_commands(runner):
     result = runner.invoke(cli, ["--help"])
     assert result.exit_code == 0
-    for cmd in ("climate", "risk", "model-train", "export", "notify", "qc", "derived",
-                "extreme", "spi"):
+    for cmd in (
+        "climate",
+        "risk",
+        "model-train",
+        "export",
+        "notify",
+        "qc",
+        "derived",
+        "extreme",
+        "spi",
+    ):
         assert cmd in result.output
 
 
@@ -115,8 +124,9 @@ def test_risk_cmd_smoke(runner, tmp_path):
     lat = np.linspace(-26, -20, 4)
     lon = np.linspace(-48, -44, 5)
     data = np.full((4, 5), 2000.0, dtype=np.float32)
-    ds = xr.Dataset({"cape": (("latitude", "longitude"), data)},
-                    coords={"latitude": lat, "longitude": lon})
+    ds = xr.Dataset(
+        {"cape": (("latitude", "longitude"), data)}, coords={"latitude": lat, "longitude": lon}
+    )
     ds.attrs["crs"] = 4326
     ds.to_netcdf(path)
     result = runner.invoke(cli, ["risk", "-f", str(path), "-k", "hail"])
@@ -136,8 +146,8 @@ def test_qc_cmd_smoke(runner, tmp_path):
         encoding="utf-8",
     )
     result = runner.invoke(
-        cli, ["qc", "-f", str(path), "--min-value", "-50", "--max-value", "50",
-              "--persistence", "2"]
+        cli,
+        ["qc", "-f", str(path), "--min-value", "-50", "--max-value", "50", "--persistence", "2"],
     )
     assert result.exit_code == 0
     assert "gross_error" in result.output
@@ -208,8 +218,7 @@ def test_extreme_cmd_pot_method(runner, tmp_path):
 def test_spi_cmd_smoke(runner, tmp_path):
     path = tmp_path / "precip.csv"
     path.write_text(
-        "time,value\n"
-        + "".join(f"2021-01-01T00:00:00,{1.0 + (i % 3) * 0.5}\n" for i in range(30)),
+        "time,value\n" + "".join(f"2021-01-01T00:00:00,{1.0 + (i % 3) * 0.5}\n" for i in range(30)),
         encoding="utf-8",
     )
     result = runner.invoke(cli, ["spi", "-f", str(path), "-w", "4", "--current"])
@@ -226,15 +235,23 @@ def test_spi_cmd_missing_file(runner):
 def test_spei_cmd_smoke(runner, tmp_path):
     precip = tmp_path / "precip.csv"
     temp = tmp_path / "temp.csv"
-    precip.write_text(
-        "time,precip\n" + "".join(f"{i},5.0\n" for i in range(40)), encoding="utf-8"
+    precip.write_text("time,precip\n" + "".join(f"{i},5.0\n" for i in range(40)), encoding="utf-8")
+    temp.write_text("time,temp\n" + "".join(f"{i},20.0\n" for i in range(40)), encoding="utf-8")
+    result = runner.invoke(
+        cli,
+        [
+            "spei",
+            "-p",
+            str(precip),
+            "-t",
+            str(temp),
+            "-la",
+            "-15",
+            "-w",
+            "4",
+            "--current",
+        ],
     )
-    temp.write_text(
-        "time,temp\n" + "".join(f"{i},20.0\n" for i in range(40)), encoding="utf-8"
-    )
-    result = runner.invoke(cli, [
-        "spei", "-p", str(precip), "-t", str(temp), "-la", "-15", "-w", "4", "--current",
-    ])
     assert result.exit_code == 0
     assert "SPEI" in result.output
 

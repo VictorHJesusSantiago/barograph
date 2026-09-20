@@ -15,9 +15,7 @@ from barograph.climatology import (
 
 
 def test_monthly_climatology_means():
-    times = [
-        datetime(2020, m, 15) for m in range(1, 13)
-    ]
+    times = [datetime(2020, m, 15) for m in range(1, 13)]
     values = np.array([float(m) for m in range(1, 13)])
     monthly = monthly_climatology(values, times, years=(2020, 2020))
     assert monthly[1][0] == 1.0
@@ -51,7 +49,9 @@ def test_climatology_normal_deviation():
 
 def test_climatology_normal_unknown_month_raises():
     normal = ClimatologyNormal(
-        variable="t", baseline_start=1991, baseline_end=2020,
+        variable="t",
+        baseline_start=1991,
+        baseline_end=2020,
         monthly_mean={},
     )
     try:
@@ -63,7 +63,10 @@ def test_climatology_normal_unknown_month_raises():
 
 def test_standardized_zero_std():
     normal = ClimatologyNormal(
-        variable="t", baseline_start=1991, baseline_end=2020,
-        monthly_mean={1: 10.0}, monthly_std={1: 0.0},
+        variable="t",
+        baseline_start=1991,
+        baseline_end=2020,
+        monthly_mean={1: 10.0},
+        monthly_std={1: 0.0},
     )
     assert normal.standardized_deviation(12.0, 1) == 0.0
