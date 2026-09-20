@@ -39,8 +39,7 @@ def test_server_dispatch():
     status, payload = server.handle_request("GET", "/health")
     assert status == 200
     assert payload["status"] == "ok"
-    status, payload = server.handle_request("POST", "/submit",
-                                            {"x": 1})
+    status, payload = server.handle_request("POST", "/submit", {"x": 1})
     assert payload["got"] == {"x": 1}
 
 
@@ -61,6 +60,7 @@ def test_server_handler_error_500():
 
 def _pick_port():
     import socket
+
     with socket.socket() as s:
         s.bind(("127.0.0.1", 0))
         return s.getsockname()[1]

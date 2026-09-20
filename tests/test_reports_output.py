@@ -26,8 +26,11 @@ def make_field(size=6, val=2.0):
     lons = np.linspace(-50.0, -45.0, size)
     data = np.full((size, size), val, dtype=np.float32)
     return GriddedField(
-        data=data, lats=lats, lons=lons,
-        variable=Variable.TEMPERATURE, source=ModelSource.GFS,
+        data=data,
+        lats=lats,
+        lons=lons,
+        variable=Variable.TEMPERATURE,
+        source=ModelSource.GFS,
         valid_time=datetime(2026, 1, 1, 12),
         init_time=datetime(2026, 1, 1, 0),
     )
@@ -51,6 +54,7 @@ def test_alerts_to_json(tmp_path):
     path = ReportRenderer.alerts_to_json([make_alert()], tmp_path / "a.json")
     assert path.exists()
     import json
+
     data = json.loads(path.read_text(encoding="utf-8"))
     assert data[0]["variable"] == "precipitation"
     assert data[0]["value"] == 70.0
@@ -104,6 +108,7 @@ def test_output_writer_json(tmp_path):
     writer = OutputWriter(fmt="json", base_dir=tmp_path)
     path = writer.write(make_field())
     import json
+
     data = json.loads(path.read_text(encoding="utf-8"))
     assert data["metadata"]["variable"] == "temperature"
     assert "data" in data
@@ -120,6 +125,7 @@ def test_output_writer_netcdf(tmp_path):
     writer = OutputWriter(fmt="netcdf", base_dir=tmp_path)
     path = writer.write(make_field())
     import xarray as xr
+
     ds = xr.open_dataset(path)
     assert "temperature" in ds
 
@@ -134,11 +140,13 @@ def test_output_writer_npy(tmp_path):
 def test_output_writer_raster(tmp_path):
     lats = np.linspace(-25, -20, 5)
     lons = np.linspace(-50, -45, 5)
-    layer = RasterLayer(data=np.full((5, 5), 3.0, dtype=np.float32),
-                        lats=lats, lons=lons, name="precip")
+    layer = RasterLayer(
+        data=np.full((5, 5), 3.0, dtype=np.float32), lats=lats, lons=lons, name="precip"
+    )
     writer = OutputWriter(fmt="json", base_dir=tmp_path)
     path = writer.write(layer)
     import json
+
     data = json.loads(path.read_text(encoding="utf-8"))
     assert data["metadata"]["type"] == "raster"
     assert data["metadata"]["name"] == "precip"
@@ -163,6 +171,7 @@ def test_field_plotter_png_or_skip(tmp_path):
 def test_field_plotter_missing_matplotlib(tmp_path):
     # monkeypatch import to simulate absence
     import barograph.output.plots as plots
+
     original = FieldPlotter.save
     _ = original
 

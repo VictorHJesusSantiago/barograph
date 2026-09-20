@@ -15,10 +15,8 @@ from barograph.risk import (
 
 def test_hail_index_scale():
     # High CAPE + helicity + shear should give a high score
-    high = hail_index(cape=np.array([3000.0]), srh=np.array([400.0]),
-                      wind_shear=np.array([40.0]))
-    low = hail_index(cape=np.array([100.0]), srh=np.array([0.0]),
-                     wind_shear=np.array([5.0]))
+    high = hail_index(cape=np.array([3000.0]), srh=np.array([400.0]), wind_shear=np.array([40.0]))
+    low = hail_index(cape=np.array([100.0]), srh=np.array([0.0]), wind_shear=np.array([5.0]))
     assert high[0] > low[0]
     assert 0.0 <= high[0] <= 10.0
 
@@ -50,8 +48,7 @@ def test_wind_classification():
 
 
 def test_flood_risk_saturated():
-    score = flood_risk_score(np.array([100.0]), np.array([300.0]),
-                             np.array([1.0]))
+    score = flood_risk_score(np.array([100.0]), np.array([300.0]), np.array([1.0]))
     assert score[0] == 1.0
     low = flood_risk_score(np.array([0.0]), np.array([0.0]), np.array([0.0]))
     assert low[0] == 0.0
