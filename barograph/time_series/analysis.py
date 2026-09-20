@@ -7,9 +7,7 @@ from datetime import datetime
 import numpy as np
 
 
-def linear_trend(
-    values: np.ndarray, times: list[datetime]
-) -> tuple[float, float, float]:
+def linear_trend(values: np.ndarray, times: list[datetime]) -> tuple[float, float, float]:
     """Fit a linear trend ``value = a + b * t`` by least squares.
 
     Returns:
@@ -82,7 +80,7 @@ def standard_anomalies(
     anomalies = np.empty(values.shape, dtype=np.float64)
     for i, d in enumerate(doy):
         base = climatology[d - 1]
-        window = climatology[max(0, d - 11):d + 10]
+        window = climatology[max(0, d - 11) : d + 10]
         std = np.nanstd(window)
         anomalies[i] = (values[i] - base) / std if std > 0 else 0.0
     return anomalies

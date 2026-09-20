@@ -19,9 +19,7 @@ class PrecipitationEvent:
     duration_hours: int
 
 
-def rolling_precip(
-    values: np.ndarray, window: int, period_hours: float = 1.0
-) -> np.ndarray:
+def rolling_precip(values: np.ndarray, window: int, period_hours: float = 1.0) -> np.ndarray:
     """Cumulative precipitation over a rolling window of *window* samples.
 
     Args:
@@ -45,9 +43,7 @@ def rolling_precip(
     return out
 
 
-def wet_days_fraction(
-    values: np.ndarray, threshold: float = 0.1
-) -> float:
+def wet_days_fraction(values: np.ndarray, threshold: float = 0.1) -> float:
     """Fraction of samples with precipitation above *threshold* (0..1)."""
     values = np.asarray(values, dtype=np.float64)
     valid = np.isfinite(values)
@@ -74,9 +70,7 @@ class PrecipitationAnalyzer:
         self.min_wet = min_wet
         self.period_hours = period_hours
 
-    def events(
-        self, values: np.ndarray, times: list[datetime]
-    ) -> list[PrecipitationEvent]:
+    def events(self, values: np.ndarray, times: list[datetime]) -> list[PrecipitationEvent]:
         """Detect contiguous precipitation events in the series."""
         values = np.asarray(values, dtype=np.float64)
         result: list[PrecipitationEvent] = []
