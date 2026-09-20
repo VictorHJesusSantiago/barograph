@@ -1,3 +1,5 @@
+import os
+
 # Configuration file for the Sphinx documentation builder.
 
 project = "Barograph"
@@ -9,9 +11,11 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
-    "sphinx.ext.intersphinx",
     "sphinx_autodoc_typehints",
 ]
+
+if os.environ.get("BAROGRAPH_OFFLINE_DOCS") != "1":
+    extensions.append("sphinx.ext.intersphinx")
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
@@ -19,11 +23,12 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
 
-intersphinx_mapping = {
-    "python": ("https://docs.python.org/3", None),
-    "numpy": ("https://numpy.org/doc/stable", None),
-    "xarray": ("https://docs.xarray.dev/en/stable", None),
-}
+if "sphinx.ext.intersphinx" in extensions:
+    intersphinx_mapping = {
+        "python": ("https://docs.python.org/3", None),
+        "numpy": ("https://numpy.org/doc/stable", None),
+        "xarray": ("https://docs.xarray.dev/en/stable", None),
+    }
 
 autodoc_member_order = "bysource"
 autodoc_typehints = "description"

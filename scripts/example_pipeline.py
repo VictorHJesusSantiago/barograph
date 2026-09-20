@@ -34,8 +34,13 @@ def make_toy_field(
     data = base + noise * rng.standard_normal(shape)
     t = datetime(2026, 1, 2, 12)
     return GriddedField(
-        data=data, lats=lats, lons=lons, variable=variable,
-        source=ModelSource.GFS, valid_time=t, init_time=t,
+        data=data,
+        lats=lats,
+        lons=lons,
+        variable=variable,
+        source=ModelSource.GFS,
+        valid_time=t,
+        init_time=t,
     )
 
 
@@ -51,8 +56,7 @@ def main():
 
     # --- 2. Ensemble ---
     members = [
-        make_toy_field(Variable.TEMPERATURE, base=24.0 + i, noise=1.5, seed=i)
-        for i in range(5)
+        make_toy_field(Variable.TEMPERATURE, base=24.0 + i, noise=1.5, seed=i) for i in range(5)
     ]
     ens = EnsembleForecast(
         members=members,
@@ -73,8 +77,8 @@ def main():
 
     # --- 3. Post-processing: quantile mapping ---
     rng = np.random.default_rng(42)
-    model_hist = rng.normal(6, 2, 5000)   # raw model precipitation
-    obs_hist = rng.normal(8, 2.5, 5000)   # observed precipitation
+    model_hist = rng.normal(6, 2, 5000)  # raw model precipitation
+    obs_hist = rng.normal(8, 2.5, 5000)  # observed precipitation
     qm = QuantileMapper(n_bins=100).fit(model_hist, obs_hist)
     print(f"QM mean shift sample: {qm.transform_data(np.array([6.0]))[0]:.2f}")
 
@@ -101,13 +105,15 @@ def main():
 
     # --- 6. Alerts ---
     engine = AlertEngine(cooldown_minutes=0, notification_channels=["stdout"])
-    engine.add_rule(AlertRule(
-        variable=Variable.TEMPERATURE,
-        threshold=29.0,
-        operator=Operator.GREATER_OR_EQUAL,
-        severity=Severity.WARNING,
-        name="warm_spots",
-    ))
+    engine.add_rule(
+        AlertRule(
+            variable=Variable.TEMPERATURE,
+            threshold=29.0,
+            operator=Operator.GREATER_OR_EQUAL,
+            severity=Severity.WARNING,
+            name="warm_spots",
+        )
+    )
     alerts = engine.evaluate_field(forecast)
     print(f"Fired {len(alerts)} alerts")
 
