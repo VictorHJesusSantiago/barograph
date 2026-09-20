@@ -50,9 +50,7 @@ class RasterMasker:
         return ~mask.astype(bool)
 
     @staticmethod
-    def morphology(
-        mask: np.ndarray, operation: str = "erode", iterations: int = 1
-    ) -> np.ndarray:
+    def morphology(mask: np.ndarray, operation: str = "erode", iterations: int = 1) -> np.ndarray:
         """Apply binary morphological opening/closing to smooth a mask."""
         from scipy import ndimage
 
@@ -76,9 +74,7 @@ class RasterMasker:
         return np.isin(labeled, keep)
 
     @staticmethod
-    def apply(
-        layer: RasterLayer, mask: np.ndarray, fill: float = np.nan
-    ) -> RasterLayer:
+    def apply(layer: RasterLayer, mask: np.ndarray, fill: float = np.nan) -> RasterLayer:
         """Return a copy of the layer with masked cells set to ``fill``."""
         result = layer.copy()
         for b in range(result.nbands):

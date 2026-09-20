@@ -75,8 +75,10 @@ class ZRRelation:
     def rainfall_rate(self, dbz: np.ndarray) -> np.ndarray:
         dbz = np.asarray(dbz)
         if self._fn is None:
-            a, b = np.full_like(dbz, _MARSHALL_PALMER_A, dtype=float), \
-                   np.full_like(dbz, _MARSHALL_PALMER_B, dtype=float)
+            a, b = (
+                np.full_like(dbz, _MARSHALL_PALMER_A, dtype=float),
+                np.full_like(dbz, _MARSHALL_PALMER_B, dtype=float),
+            )
         else:
             a, b = self._fn(dbz)
             a = np.broadcast_to(a, dbz.shape)
