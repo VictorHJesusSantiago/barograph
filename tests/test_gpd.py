@@ -68,8 +68,7 @@ def test_exponential_level_recovered_from_fit():
     excess = _sample_exponential(3.0, 20000, seed=4)
     dist = fit_gpd(excess, threshold=0.0)
     rl = return_level(
-        GPDDistribution(scale=dist.scale, shape=dist.shape, threshold=10.0,
-                        n_year=10.0),
+        GPDDistribution(scale=dist.scale, shape=dist.shape, threshold=10.0, n_year=10.0),
         np.array([50.0]),
     )
     theoretical = 10.0 + 3.0 * np.log(500.0)
