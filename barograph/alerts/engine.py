@@ -173,9 +173,7 @@ class AlertEngine:
         for alert in alerts:
             self._notify(alert)
 
-    def _in_region(
-        self, lat: float, lon: float, region: list[tuple[float, float]]
-    ) -> bool:
+    def _in_region(self, lat: float, lon: float, region: list[tuple[float, float]]) -> bool:
         try:
             import matplotlib.path as mpltPath
         except ImportError:
@@ -218,17 +216,19 @@ class AlertEngine:
             import json
             import urllib.request
 
-            payload = json.dumps({
-                "variable": alert.variable.value,
-                "threshold": alert.threshold,
-                "operator": alert.operator,
-                "value": alert.value,
-                "lat": alert.location.latitude,
-                "lon": alert.location.longitude,
-                "severity": alert.severity,
-                "message": alert.message,
-                "time": alert.trigger_time.isoformat(),
-            }).encode("utf-8")
+            payload = json.dumps(
+                {
+                    "variable": alert.variable.value,
+                    "threshold": alert.threshold,
+                    "operator": alert.operator,
+                    "value": alert.value,
+                    "lat": alert.location.latitude,
+                    "lon": alert.location.longitude,
+                    "severity": alert.severity,
+                    "message": alert.message,
+                    "time": alert.trigger_time.isoformat(),
+                }
+            ).encode("utf-8")
 
             req = urllib.request.Request(
                 url, data=payload, headers={"Content-Type": "application/json"}

@@ -69,17 +69,14 @@ class HTTPClient:
         """GET *url* with query parameters, retrying on failure."""
         if params:
             sep = "&" if "?" in url else "?"
-            qs = "&".join(f"{k}={urllib.parse.quote(str(v))}"
-                          for k, v in params.items())
+            qs = "&".join(f"{k}={urllib.parse.quote(str(v))}" for k, v in params.items())
             url = f"{url}{sep}{qs}"
 
         attempts = self.max_retries + 1
         backoff = self.backoff_seconds
         for attempt in range(attempts):
             try:
-                status, body = self.transport(
-                    url, timeout=self.timeout_seconds
-                )
+                status, body = self.transport(url, timeout=self.timeout_seconds)
             except Exception as exc:  # noqa: BLE001 - transport failures vary
                 status, body = 0, str(exc)
             if 200 <= status < 300:
@@ -87,10 +84,11 @@ class HTTPClient:
             if attempt < attempts - 1:
                 logger.warning(
                     "HTTP {status} from {url}; retry {attempt}/{attempts}",
-                    status=status, url=url, attempt=attempt + 1,
+                    status=status,
+                    url=url,
+                    attempt=attempt + 1,
                     attempts=attempts,
                 )
                 time.sleep(backoff)
                 backoff *= 2
         raise HTTPError(f"Request to {url} failed with status {status}")
-
